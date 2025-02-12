@@ -16,6 +16,9 @@
         height: 180px;
         object-fit: cover;
     }
+    &__img.not_image {
+        object-fit: fill;
+    }
     &__info {
         display: grid;
         grid-template-rows: minmax(29px, auto) 90px 38px;
@@ -59,5 +62,8 @@
         position: absolute;
         bottom: 14px;
         right: -37px;
+    }
+    .button__main.loading {
+        display: none;
     }
 }

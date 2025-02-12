@@ -1,3 +1,4 @@
+import notImage from "../resources/img/image_not_available.webp"
 
 class MarvelService {
     _apiBase = 'https://gateway.marvel.com:443/v1/public/'
@@ -24,7 +25,7 @@ class MarvelService {
     }
 
     _transformCharacter = (char) => {
-        const { name, description, thumbnail, urls } = char
+        const { id, name, description, thumbnail, urls } = char
 
         const sliceText = (test, maxLen = 220) => {
             let str = test.trim().replace(/\s+/g, " ") || 'no information available'
@@ -33,10 +34,13 @@ class MarvelService {
             return str
         }
 
+        const srcThumbnail = thumbnail.path.includes('image_not_available') ? notImage : `${thumbnail.path}.${thumbnail.extension}`
+
         return {
+            id,
             name,
             description: sliceText(description),
-            thumbnail: `${thumbnail.path}.${thumbnail.extension}`,
+            thumbnail: srcThumbnail,
             homepage: urls[0].url,
             wiki: urls[1].url
         }
