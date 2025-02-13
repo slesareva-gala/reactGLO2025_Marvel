@@ -16,7 +16,32 @@ class RandomChar extends Component {
     }
 
     marvelService = new MarvelService()
-    stackChar = []
+    stackChars = {
+        _chars: [],
+        _qtyMin: 5,
+        _qtyMax: 15,
+        _qtyExpected: 0,
+
+        available: () => {
+            const { _chars, _qtyMin, _qtyMax, _qtyExpected } = this.stackChars
+            let qtySend = _qtyMax - _chars.length - _qtyExpected
+
+            if ((_chars.length + _qtyExpected) < _qtyMin) {
+                for (let i = 0; i < qtySend; i++) {
+                    this.updateChar()
+                }
+                this.stackChars._qtyExpected += qtySend
+            }
+            return _chars.length > 0
+        },
+
+        set: (char) => {
+            if (char === null) this.stackChars._chars.push(null)
+            else this.stackChars._chars.push(char)
+            this.stackChars._qtyExpected -= 1
+        },
+        get: () => this.stackChars._chars.pop(),
+    }
 
     componentDidMount() {
         this.onCharRender()
@@ -30,31 +55,23 @@ class RandomChar extends Component {
     }
 
     onCharRender = () => {
-        if (this.stackChar.length < 3) this.updateChar()
-        if (this.stackChar.length < 1 || this.state.selected) return
+        if (!this.stackChars.available() || this.state.selected) return
 
-        const stackChar = this.stackChar.shift()
-        this.setState({ char: { ...stackChar.char }, loading: false, error: stackChar.error })
+        const char = this.stackChars.get()
+
+        this.setState({
+            char,
+            loading: false,
+            error: (char === null)
+        })
     }
 
     onCharSelected = () => {
         this.setState({ selected: !this.state.selected })
     }
 
-    charLoaded = (char) => {
-        this.stackChar.push({
-            char: { ...char },
-            loading: false,
-            error: false
-        })
-    }
-    charError = () => {
-        this.stackChar.push({
-            char: {},
-            loading: false,
-            error: true
-        })
-    }
+    charLoaded = (chars) => this.stackChars.set(chars)
+    charError = () => this.stackChars.set(null)
 
     updateChar = () => {
         const id = Math.floor(Math.random() * 400 + 1011000)
@@ -66,9 +83,9 @@ class RandomChar extends Component {
 
     render() {
         const { char, selected, loading, error } = this.state
-        const cardChar = error ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} />
+        const cardChar = error ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} selected={selected} />
         const btnText = selected ? 'Show other' : 'I choose'
-        const btnClass = `button button__main ${loading ? 'loading' : ''}`
+        const btnClass = `button ${loading ? 'button__secondary' : 'button__main'}`
 
         return (
             <div className="randomchar">
@@ -93,21 +110,22 @@ class RandomChar extends Component {
 }
 
 
-const View = ({ char }) => {
-    const { name, description, thumbnail, homepage, wiki } = char
+const View = ({ char, selected }) => {
+    const { id, name, description, thumbnail, homepage, wiki } = char
+    const btnClass = `button ${selected ? 'button__main' : 'button__secondary'}`
     const classImg = `randomchar__img ${thumbnail.includes('image_not_available') ? 'not_image' : ''}`
 
     return (
-        <div className="randomchar__block">
+        <div className="randomchar__block" key={id}>
             <img src={thumbnail} alt="Random character" className={classImg} />
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>
                 <p className="randomchar__descr">{description}</p>
                 <div className="randomchar__btns">
-                    <a href={homepage} className="button button__main">
+                    <a href={homepage} className={btnClass}>
                         <div className="inner">homepage</div>
                     </a>
-                    <a href={wiki} className="button button__secondary">
+                    <a href={wiki} className={btnClass}>
                         <div className="inner">Wiki</div>
                     </a>
                 </div>

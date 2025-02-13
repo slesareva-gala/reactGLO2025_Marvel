@@ -45,12 +45,17 @@
             transition: none;
         }
     }
-    &__main, &__secondary {
+    &__main {
         &:hover {
-            color: #fff;
+            color: yellow;
         }
     }
     &__secondary {
+        pointer-events: none;
+        &:hover {
+            color: #fff;
+            transform: none !important;
+        }
         .inner {
             background-color: $grey;
             &::before {
@@ -60,7 +65,7 @@
             &::after {
                 border-color: $grey transparent; 
                 transition: none;
-            }
+            }         
         }
     }
     &::before {
