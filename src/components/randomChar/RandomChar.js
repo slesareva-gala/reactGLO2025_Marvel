@@ -18,8 +18,8 @@ class RandomChar extends Component {
     marvelService = new MarvelService()
     stackChars = {
         _chars: [],
-        _qtyMin: 5,
-        _qtyMax: 15,
+        _qtyMin: this.props.stackMin,
+        _qtyMax: this.props.stackMax,
         _qtyExpected: 0,
 
         available: () => {
@@ -50,6 +50,13 @@ class RandomChar extends Component {
         }, 3000)
 
     }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.error429 !== prevProps.error429) {
+            clearInterval(this.timerId)
+        }
+    }
+
     componentWillUnmount() {
         clearInterval(this.timerId)
     }
@@ -71,7 +78,10 @@ class RandomChar extends Component {
     }
 
     charLoaded = (chars) => this.stackChars.set(chars)
-    charError = () => this.stackChars.set(null)
+    charError = (e) => {
+        this.stackChars.set(null)
+        if (e.message === '429') this.props.onError429()
+    }
 
     updateChar = () => {
         const id = Math.floor(Math.random() * 400 + 1011000)
@@ -83,9 +93,11 @@ class RandomChar extends Component {
 
     render() {
         const { char, selected, loading, error } = this.state
-        const cardChar = error ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} selected={selected} />
+        const { error429 } = this.props
+
+        const cardChar = (error || error429) ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} selected={selected} />
         const btnText = selected ? 'Show other' : 'I choose'
-        const btnClass = `button ${loading ? 'button__secondary' : 'button__main'}`
+        const btnClass = `button ${(loading || error429) ? 'button__secondary' : 'button__main'}`
 
         return (
             <div className="randomchar">
@@ -104,23 +116,30 @@ class RandomChar extends Component {
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
                 </div>
-            </div >
+            </div>
         )
     }
 }
 
+const sliceText = (text, maxLen) => {
+    let str = text.trim().replace(/\s+/g, " ") || 'no information available'
+
+    if (str.length > maxLen) str = str.slice(0, maxLen - 3).match(/.+(?=\s)/g) + "..."
+    return str
+}
 
 const View = ({ char, selected }) => {
     const { id, name, description, thumbnail, homepage, wiki } = char
     const btnClass = `button ${selected ? 'button__main' : 'button__secondary'}`
     const classImg = `randomchar__img ${thumbnail.includes('image_not_available') ? 'not_image' : ''}`
+    const descriptionShort = sliceText(description, 210)
 
     return (
         <div className="randomchar__block" key={id}>
-            <img src={thumbnail} alt="Random character" className={classImg} />
+            <img src={thumbnail} alt={name} className={classImg} />
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>
-                <p className="randomchar__descr">{description}</p>
+                <p className="randomchar__descr">{descriptionShort}</p>
                 <div className="randomchar__btns">
                     <a href={homepage} className={btnClass}>
                         <div className="inner">homepage</div>

@@ -15,34 +15,37 @@ class MarvelService {
 
 
     getAllCharacters = async (qty = 9) => {
-        const res = await this.getResource(`${this._apiBase}characters?limit=${qty}&offset=210&${this._apikey}`)
-        return res.data.results.map(this._transformCharacter)
+        try {
+            const res = await this.getResource(`${this._apiBase}characters?limit=${qty}&offset=210&${this._apikey}`)
+            return res.data.results.map(this._transformCharacter)
+        } catch (e) {
+            throw new Error(e.message.match(/(?<=status:\s*)\d{3}/g)[0])
+        }
     }
 
     getCharacter = async (id) => {
-        const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apikey} `)
-        return this._transformCharacter(res.data.results[0])
+        try {
+            const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apikey} `)
+            return this._transformCharacter(res.data.results[0])
+        } catch (e) {
+            throw new Error(e.message.match(/(?<=status:\s*)\d{3}/g)[0])
+        }
+
     }
 
     _transformCharacter = (char) => {
         const { id, name, description, thumbnail, urls } = char
-
-        const sliceText = (test, maxLen = 220) => {
-            let str = test.trim().replace(/\s+/g, " ") || 'no information available'
-
-            if (str.length > maxLen) str = str.slice(0, maxLen - 3).match(/.+(?=\s)/g) + "..."
-            return str
-        }
 
         const srcThumbnail = thumbnail.path.includes('image_not_available') ? notImage : `${thumbnail.path}.${thumbnail.extension}`
 
         return {
             id,
             name,
-            description: sliceText(description),
+            description: description,
             thumbnail: srcThumbnail,
             homepage: urls[0].url,
-            wiki: urls[1].url
+            wiki: urls[1].url,
+            comics: char.comics.items,
         }
     }
 

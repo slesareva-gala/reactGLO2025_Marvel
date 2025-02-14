@@ -54,14 +54,16 @@ input::-webkit-inner-spin-button {
     position: relative;
     .bg-decoration {
         position: absolute;
+        visibility: hidden;
         right: -174px;
-        bottom: -70px;
+        top: unset;
+        bottom: -130px;
         z-index: -1;
     }
 }
 
 main {
-    margin-top: 50px;
+    margin-top: 50px;    
     position: relative;
 }
 
