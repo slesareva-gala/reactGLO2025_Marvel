@@ -1,4 +1,5 @@
-import notImage from "../resources/img/image_not_available.webp"
+import imgNotFound from "../resources/img/image_not_found.webp"
+import imgNotAvailbale from "../resources/img/image_not_available.webp"
 
 class MarvelService {
     _apiBase = 'https://gateway.marvel.com:443/v1/public/'
@@ -14,9 +15,9 @@ class MarvelService {
     }
 
 
-    getAllCharacters = async (qty = 9) => {
+    getAllCharacters = async (offset) => {
         try {
-            const res = await this.getResource(`${this._apiBase}characters?limit=${qty}&offset=210&${this._apikey}`)
+            const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apikey}`)
             return res.data.results.map(this._transformCharacter)
         } catch (e) {
             throw new Error(e.message.match(/(?<=status:\s*)\d{3}/g)[0])
@@ -36,7 +37,9 @@ class MarvelService {
     _transformCharacter = (char) => {
         const { id, name, description, thumbnail, urls } = char
 
-        const srcThumbnail = thumbnail.path.includes('image_not_available') ? notImage : `${thumbnail.path}.${thumbnail.extension}`
+        const srcThumbnail = thumbnail.path.includes('image_not_available') ? imgNotFound
+            : thumbnail.path.includes('4c002e0305708') ? imgNotAvailbale
+                : `${thumbnail.path}.${thumbnail.extension}`
 
         return {
             id,

@@ -9,35 +9,55 @@ import './charList.scss';
 class CharList extends Component {
     state = {
         chars: [],
+        moreLoading: false,
+        offset: 210,
+        charEnded: false,
     }
 
     marvelService = new MarvelService()
 
     componentDidMount() {
+        this.onRequest()
+    }
+
+    onRequest = () => {
         this.marvelService
-            .getAllCharacters()
+            .getAllCharacters(this.state.offset)
             .then(this.onCharListLoaded)
             .catch(this.onCharListError)
     }
 
-    onCharListLoaded = (chars) => {
+    onCharListMore = () => {
         this.setState({
-            chars,
-            selectId: chars[0].id,
+            moreLoading: true
         })
-        this.props.onListLoaded()
+        this.onRequest()
+    }
+
+    onCharListLoaded = (newChars) => {
+        this.setState(({ chars, offset }) => ({
+            chars: [...chars, ...newChars],
+            moreLoading: false,
+            offset: offset + 9,
+            charEnded: newChars.length < 9
+        }))
+        if (this.props.loadingList) this.props.onListLoaded(false)
     }
 
     onCharListError = (e) => {
         if (e.message === '429') this.props.onError429()
-        else this.props.onListError()
+        else {
+            this.setState({
+                moreLoading: false
+            })
+            this.props.onListError()
+        }
     }
 
     viewList = (chars) => {
         const cardsChars = chars.map(char => {
             const { id, name, thumbnail } = char
             const classLi = `char__item ${id === this.props.charId ? 'char__item_selected' : ''}`
-            const classImg = thumbnail.includes('image_not_available') ? 'not_image' : ''
 
             return (
                 <li
@@ -45,7 +65,7 @@ class CharList extends Component {
                     key={id}
                     onClick={() => this.props.onCharSelected(id)}
                 >
-                    <img src={thumbnail} alt={name} className={classImg} />
+                    <img src={thumbnail} alt={name} />
                     <div className="char__name">{name}</div>
                 </li>
             )
@@ -59,17 +79,24 @@ class CharList extends Component {
     }
 
     render() {
-        const { chars } = this.state
-        const { loading, error, error429 } = this.props
+        const { chars, moreLoading, charEnded } = this.state
+        const { loadingList, error, error429 } = this.props
 
         const charList = error429 ? (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
-            : error ? <ErrorMessage /> : loading ? <Spinner /> : this.viewList(chars)
+            : error ? <ErrorMessage /> : loadingList ? <Spinner /> : this.viewList(chars)
+        const classButton = `button ${moreLoading ? 'button__secondary' : 'button__main'} button__long`
+        const styleButton = moreLoading ? { width: 'unset' } : {}
 
         return (
             <div className="char__list">
                 {charList}
-                {(loading || error) ? null : (
-                    <button className="button button__main button__long">
+                {moreLoading ? <Spinner /> : null}
+                {(error429 || loadingList || charEnded) ? null : (
+                    <button
+                        className={classButton}
+                        onClick={this.onCharListMore}
+                        style={styleButton}
+                    >
                         <div className="inner">load more</div>
                     </button>
                 )}

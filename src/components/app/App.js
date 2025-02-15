@@ -62,7 +62,7 @@ class App extends Component {
                         <ErrorBoundary>
                             <CharList
                                 onListLoaded={this.onListLoaded}
-                                loading={this.state.loadingList}
+                                loadingList={this.state.loadingList}
                                 onListError={this.onListError}
                                 error={this.state.errorList}
                                 onError429={this.onError429} error429={this.state.error429}

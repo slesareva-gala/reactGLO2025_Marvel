@@ -25,10 +25,8 @@
             width: 150px;
             height: 150px;
             object-fit: cover;
-        }
-        img.not_image {
-            object-fit: fill;
-        }
+            object-position: top center;
+        }      
     }
     &__btns {
         margin-top: 35px;

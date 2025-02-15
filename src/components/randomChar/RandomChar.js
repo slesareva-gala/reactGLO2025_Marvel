@@ -133,12 +133,11 @@ const sliceText = (text, maxLen) => {
 const View = ({ char, selected }) => {
     const { id, name, description, thumbnail, homepage, wiki } = char
     const btnClass = `button ${selected ? 'button__main' : 'button__secondary'}`
-    const classImg = `randomchar__img ${thumbnail.includes('image_not_available') ? 'not_image' : ''}`
     const descriptionShort = sliceText(description, 210)
 
     return (
         <div className="randomchar__block" key={id}>
-            <img src={thumbnail} alt={name} className={classImg} />
+            <img src={thumbnail} alt={name} className="randomchar__img" />
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>
                 <p className="randomchar__descr">{descriptionShort}</p>

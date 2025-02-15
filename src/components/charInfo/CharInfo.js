@@ -83,14 +83,13 @@ class CharInfo extends Component {
 
 const View = ({ char, comicsMax }) => {
     const { id, name, description, thumbnail, homepage, wiki, comics } = char
-    const classImg = thumbnail.includes('image_not_available') ? 'not_image' : ''
     const qtyComics = Math.min(comics.length, comicsMax)
     comics.length = qtyComics
 
     return (
         <>
             <div className="char__basics" key={id}>
-                <img src={thumbnail} alt={name} className={classImg} />
+                <img src={thumbnail} alt={name} />
                 <div>
                     <div className="char__info-name">{name}</div>
                     <div className="char__btns">

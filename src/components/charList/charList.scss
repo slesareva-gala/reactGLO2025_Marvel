@@ -4,7 +4,7 @@
     &__content {
         margin-top: 50px;
         display: grid;
-        grid-template-columns: 650px 425px;
+        grid-template-columns: 690px 425px;
         column-gap: 25px;
         align-items: start;
     }
@@ -26,11 +26,9 @@
             width: 200px;
             height: 200px;
             object-fit: cover;
+            object-position: top center;
             transform: translate(-15px, -15px);
-        }
-        img.not_image {
-            object-fit: fill;
-        }
+        }     
         &_selected {
             box-shadow: 0 5px 20px $main-color;
             transform: translateY(-8px);
@@ -50,5 +48,9 @@
         text-transform: uppercase;
         color: $main-color;
 
+    }
+    &__list {
+        max-height: 1045px;
+        overflow-y: auto;       
     } 
 }

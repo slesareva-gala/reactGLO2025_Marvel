@@ -2,7 +2,7 @@
 
 .randomchar {
     display: grid;
-    grid-template-columns: repeat(2, 50%);
+    grid-template-columns: 650px auto;;
     align-items: center;
     box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.25);
     &__block {
@@ -15,9 +15,7 @@
         width: 180px;
         height: 180px;
         object-fit: cover;
-    }
-    &__img.not_image {
-        object-fit: fill;
+        object-position: top center;
     }
     &__info {
         display: grid;
@@ -32,10 +30,12 @@
         text-transform: uppercase;
     }
     &__descr {
-        font-size: 14px;
+        font-size: 1rem;
         line-height: 18px;
     }
     &__btns {
+        display: flex;
+        justify-content: center;
         a:nth-child(1) {
             margin-right: 30px;
         }
