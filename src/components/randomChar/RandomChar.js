@@ -10,7 +10,7 @@ import mjolnir from '../../resources/img/mjolnir.png';
 class RandomChar extends Component {
     state = {
         char: {},
-        selected: false,
+        selected: true,
         loading: true,
         error: false
     }
@@ -18,8 +18,8 @@ class RandomChar extends Component {
     marvelService = new MarvelService()
     stackChars = {
         _chars: [],
-        _qtyMin: this.props.stackMin,
-        _qtyMax: this.props.stackMax,
+        _qtyMin: Math.max(1, (this.props.stackMin || 1)),
+        _qtyMax: Math.max(1, (this.props.stackMin || 1), (this.props.stackMax || 1)),
         _qtyExpected: 0,
 
         available: () => {
@@ -40,7 +40,7 @@ class RandomChar extends Component {
             else this.stackChars._chars.push(char)
             this.stackChars._qtyExpected -= 1
         },
-        get: () => this.stackChars._chars.pop(),
+        get: () => this.stackChars._chars.pop()
     }
 
     componentDidMount() {
@@ -62,7 +62,8 @@ class RandomChar extends Component {
     }
 
     onCharRender = () => {
-        if (!this.stackChars.available() || this.state.selected) return
+
+        if (!this.stackChars.available() || (!this.state.loading && this.state.selected)) return
 
         const char = this.stackChars.get()
 
@@ -71,6 +72,7 @@ class RandomChar extends Component {
             loading: false,
             error: (char === null)
         })
+
     }
 
     onCharSelected = () => {
@@ -96,7 +98,7 @@ class RandomChar extends Component {
         const { error429 } = this.props
 
         const cardChar = (error || error429) ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} selected={selected} />
-        const btnText = selected ? 'Show other' : 'I choose'
+        const btnText = selected ? 'Show others' : 'I choose'
         const btnClass = `button ${(loading || error429) ? 'button__secondary' : 'button__main'}`
 
         return (
@@ -105,11 +107,11 @@ class RandomChar extends Component {
 
                 <div className="randomchar__static">
                     <p className="randomchar__title">
-                        Choose a random character for today!<br />
-                        Who would you like to get to know better?
+                        Random character for today!<br />
+                        Do you want to get to know him better?
                     </p>
                     <p className="randomchar__title">
-                        Try!
+                        Or choose another one
                     </p>
                     <button className={btnClass}>
                         <div className="inner" onClick={this.onCharSelected}>{btnText}</div>

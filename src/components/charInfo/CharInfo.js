@@ -36,6 +36,7 @@ class CharInfo extends Component {
             .getCharacter(charId)
             .then(this.onCharLoaded)
             .catch(this.onError)
+
     }
 
 
@@ -63,13 +64,13 @@ class CharInfo extends Component {
 
     render() {
         const { char, loading, error } = this.state
-        const { notCharList } = this.props
+        const { notCharList, comicsMax } = this.props
 
         const classBox = notCharList ? '' : 'char__info'
         const content = notCharList ? null
             : error ? <ErrorMessage />
                 : loading ? <Spinner />
-                    : char ? <View char={char} />
+                    : char ? <View char={char} comicsMax={comicsMax} />
                         : <Skeleton />
 
         return (
@@ -80,10 +81,10 @@ class CharInfo extends Component {
     }
 }
 
-const View = ({ char }) => {
+const View = ({ char, comicsMax }) => {
     const { id, name, description, thumbnail, homepage, wiki, comics } = char
     const classImg = thumbnail.includes('image_not_available') ? 'not_image' : ''
-    const qtyComics = Math.min(comics.length, this.props.comicsMax)
+    const qtyComics = Math.min(comics.length, comicsMax)
     comics.length = qtyComics
 
     return (
