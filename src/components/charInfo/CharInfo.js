@@ -1,4 +1,6 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
+
 import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
@@ -8,6 +10,10 @@ import MarvelService from "../../services/MarvelService";
 import './charInfo.scss';
 
 class CharInfo extends Component {
+    static defaultProps = {
+        comicsMax: 10,
+    }
+
     state = {
         char: null,
         loading: false,
@@ -122,6 +128,13 @@ const View = ({ char, comicsMax }) => {
             </ul>
         </>
     )
+}
+
+CharInfo.propTypes = {
+    charId: PropTypes.number.isRequired,
+    notCharList: PropTypes.bool.isRequired,
+    onError429: PropTypes.func.isRequired,
+    comicsMax: PropTypes.number
 }
 
 export default CharInfo;

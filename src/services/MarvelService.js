@@ -15,9 +15,9 @@ class MarvelService {
     }
 
 
-    getAllCharacters = async (offset) => {
+    getAllCharacters = async (offset, limit = 9) => {
         try {
-            const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=${offset}&${this._apikey}`)
+            const res = await this.getResource(`${this._apiBase}characters?limit=${limit}&offset=${offset}&${this._apikey}`)
             return res.data.results.map(this._transformCharacter)
         } catch (e) {
             throw new Error(e.message.match(/(?<=status:\s*)\d{3}/g)[0])

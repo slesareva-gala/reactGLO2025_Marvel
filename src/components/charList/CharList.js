@@ -1,10 +1,13 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import MarvelService from "../../services/MarvelService";
 
 import './charList.scss';
+
+const charsMarvel = 1564 // на 16.02.2025
 
 class CharList extends Component {
     state = {
@@ -39,7 +42,7 @@ class CharList extends Component {
             chars: [...chars, ...newChars],
             moreLoading: false,
             offset: offset + 9,
-            charEnded: newChars.length < 9
+            charEnded: newChars.length < 9 || offset > charsMarvel - 10
         }))
         if (this.props.loadingList) this.props.onListLoaded(false)
     }
@@ -104,5 +107,17 @@ class CharList extends Component {
         )
     }
 }
+
+CharList.propTypes = {
+    onCharSelected: PropTypes.func.isRequired,
+    onListLoaded: PropTypes.func.isRequired,
+    onListError: PropTypes.func.isRequired,
+    onError429: PropTypes.func.isRequired,
+    loadingList: PropTypes.bool.isRequired,
+    error: PropTypes.bool.isRequired,
+    charId: PropTypes.number.isRequired,
+}
+
+
 
 export default CharList;

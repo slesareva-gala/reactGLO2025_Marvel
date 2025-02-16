@@ -11,7 +11,7 @@ class App extends Component {
     state = {
         loadingList: true,
         errorList: false,
-        selectedChar: null,
+        selectedChar: 0,
         error429: false
     }
 
@@ -53,8 +53,8 @@ class App extends Component {
                 <main>
                     <ErrorBoundary>
                         <RandomChar
-                            stackMin={1}  // in prod 5
-                            stackMax={1}  // in prod 15
+                            stackMin={1}    // in prod 5
+                            stackLimit={5}  // in prod 10
                             onError429={this.onError429} error429={this.state.error429}
                         />
                     </ErrorBoundary>
@@ -75,7 +75,6 @@ class App extends Component {
                                 notCharList={this.state.loadingList || this.state.errorList}
                                 onError429={this.onError429}
                                 charId={this.state.selectedChar}
-                                comicsMax={10}
                             />
                         </ErrorBoundary>
                     </div>

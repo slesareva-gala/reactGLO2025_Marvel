@@ -2,7 +2,7 @@ import { Component } from 'react';
 
 import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import MarvelService from "../../services/MarvelService";
+import MarvelBuffering from "../../services/MarvelBuffering";
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -15,40 +15,18 @@ class RandomChar extends Component {
         error: false
     }
 
-    marvelService = new MarvelService()
-    stackChars = {
-        _chars: [],
-        _qtyMin: Math.max(1, (this.props.stackMin || 1)),
-        _qtyMax: Math.max(1, (this.props.stackMin || 1), (this.props.stackMax || 1)),
-        _qtyExpected: 0,
-
-        available: () => {
-            const { _chars, _qtyMin, _qtyMax, _qtyExpected } = this.stackChars
-            let qtySend = _qtyMax - _chars.length - _qtyExpected
-
-            if ((_chars.length + _qtyExpected) < _qtyMin) {
-                for (let i = 0; i < qtySend; i++) {
-                    this.updateChar()
-                }
-                this.stackChars._qtyExpected += qtySend
-            }
-            return _chars.length > 0
-        },
-
-        set: (char) => {
-            if (char === null) this.stackChars._chars.push(null)
-            else this.stackChars._chars.push(char)
-            this.stackChars._qtyExpected -= 1
-        },
-        get: () => this.stackChars._chars.pop()
-    }
+    stackChars = new MarvelBuffering({
+        qtyMin: this.props.stackMin,
+        qtyLimit: this.props.stackLimit,
+        callbackOffset: () => Math.floor(Math.random() * 1200 + 210),
+        callbackError: (e) => this.charsError(e)
+    })
 
     componentDidMount() {
         this.onCharRender()
         this.timerId = setInterval(() => {
             this.onCharRender()
         }, 3000)
-
     }
 
     componentDidUpdate(prevProps) {
@@ -62,7 +40,6 @@ class RandomChar extends Component {
     }
 
     onCharRender = () => {
-
         if (!this.stackChars.available() || (!this.state.loading && this.state.selected)) return
 
         const char = this.stackChars.get()
@@ -72,25 +49,14 @@ class RandomChar extends Component {
             loading: false,
             error: (char === null)
         })
+    }
 
+    charsError(e) {
+        if (e.message === '429') this.props.onError429()
     }
 
     onCharSelected = () => {
         this.setState({ selected: !this.state.selected })
-    }
-
-    charLoaded = (chars) => this.stackChars.set(chars)
-    charError = (e) => {
-        this.stackChars.set(null)
-        if (e.message === '429') this.props.onError429()
-    }
-
-    updateChar = () => {
-        const id = Math.floor(Math.random() * 400 + 1011000)
-        this.marvelService
-            .getCharacter(id)
-            .then(this.charLoaded)
-            .catch(this.charError)
     }
 
     render() {
@@ -122,6 +88,8 @@ class RandomChar extends Component {
         )
     }
 }
+
+
 
 const sliceText = (text, maxLen) => {
     let str = text.trim().replace(/\s+/g, " ") || 'no information available'
