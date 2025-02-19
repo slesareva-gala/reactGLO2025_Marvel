@@ -26,7 +26,7 @@ class CharInfo extends Component {
         this.updateChar()
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps) {
         if (this.props.charId !== prevProps.charId) {
             this.updateChar()
         }
@@ -47,6 +47,7 @@ class CharInfo extends Component {
 
 
     onCharLoaded = (char) => {
+
         this.setState({
             char,
             loading: false
@@ -55,7 +56,7 @@ class CharInfo extends Component {
 
     onCharLoading = () => {
         this.setState({
-            loading: true
+            loading: true,
         })
     }
 
@@ -68,6 +69,10 @@ class CharInfo extends Component {
         })
     }
 
+    setRefCurrent = elem => {
+        this.refs.current = elem
+    }
+
     render() {
         const { char, loading, error } = this.state
         const { notCharList, comicsMax } = this.props
@@ -76,7 +81,7 @@ class CharInfo extends Component {
         const content = notCharList ? null
             : error ? <ErrorMessage />
                 : loading ? <Spinner />
-                    : char ? <View char={char} comicsMax={comicsMax} />
+                    : char ? <View char={char} comicsMax={comicsMax} setRefCurrent={this.setRefCurrent} onFocusTo={this.props.onFocusTo} />
                         : <Skeleton />
 
         return (
@@ -87,7 +92,7 @@ class CharInfo extends Component {
     }
 }
 
-const View = ({ char, comicsMax }) => {
+const View = ({ char, comicsMax, setRefCurrent, onFocusTo }) => {
     const { id, name, description, thumbnail, homepage, wiki, comics } = char
     const qtyComics = Math.min(comics.length, comicsMax)
     comics.length = qtyComics
@@ -99,10 +104,17 @@ const View = ({ char, comicsMax }) => {
                 <div>
                     <div className="char__info-name">{name}</div>
                     <div className="char__btns">
-                        <a href={homepage} className="button button__main">
+                        <a href={homepage}
+                            ref={link => setRefCurrent(link)}
+                            className="button button__main"
+                            onKeyDown={e => (e.code === 'ArrowLeft') ? onFocusTo('CharList') : null}
+                        >
                             <div className="inner">homepage</div>
                         </a>
-                        <a href={wiki} className="button button__secondary">
+                        <a href={wiki}
+                            className="button button__secondary"
+                            onKeyDown={e => (e.code === 'ArrowLeft') ? onFocusTo('CharList') : null}
+                        >
                             <div className="inner">Wiki</div>
                         </a>
                     </div>
@@ -134,6 +146,7 @@ CharInfo.propTypes = {
     charId: PropTypes.number.isRequired,
     notCharList: PropTypes.bool.isRequired,
     onError429: PropTypes.func.isRequired,
+    onFocusTo: PropTypes.func.isRequired,
     comicsMax: PropTypes.number
 }
 

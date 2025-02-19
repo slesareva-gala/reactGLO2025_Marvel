@@ -34,6 +34,11 @@ class App extends Component {
         })
     }
 
+    onFocusTo = (componentName) => {
+        if (!this.refs[componentName] || !this.refs[componentName].refs.current) return
+        this.refs[componentName].refs.current.focus()
+    }
+
     onError429 = () => {
         this.setState({
             error429: true,
@@ -61,6 +66,8 @@ class App extends Component {
                     <div className="char__content">
                         <ErrorBoundary>
                             <CharList
+                                ref={(link) => this.refs.CharList = link}
+                                onFocusTo={this.onFocusTo}
                                 onListLoaded={this.onListLoaded}
                                 loadingList={this.state.loadingList}
                                 onListError={this.onListError}
@@ -72,6 +79,8 @@ class App extends Component {
                         </ErrorBoundary>
                         <ErrorBoundary>
                             <CharInfo
+                                ref={(link) => this.refs.CharInfo = link}
+                                onFocusTo={this.onFocusTo}
                                 notCharList={this.state.loadingList || this.state.errorList}
                                 onError429={this.onError429}
                                 charId={this.state.selectedChar}

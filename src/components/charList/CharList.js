@@ -57,19 +57,29 @@ class CharList extends Component {
         }
     }
 
+    setRefCurrent = elem => {
+        this.refs.current = elem
+    }
+
     viewList = (chars) => {
         const cardsChars = chars.map(char => {
             const { id, name, thumbnail } = char
-            const classLi = `char__item ${id === this.props.charId ? 'char__item_selected' : ''}`
+            const idSelected = id === this.props.charId
+            const classLi = `char__item ${idSelected ? 'char__item_selected' : ''}`
 
             return (
                 <li
                     className={classLi}
                     key={id}
-                    onClick={() => this.props.onCharSelected(id)}
                 >
-                    <img src={thumbnail} alt={name} />
-                    <div className="char__name">{name}</div>
+                    <button
+                        ref={link => idSelected ? this.setRefCurrent(link) : null}
+                        onClick={() => this.props.onCharSelected(id)}
+                        onKeyDown={e => (e.code === 'ArrowRight' && idSelected) ? this.props.onFocusTo('CharInfo') : null}
+                    >
+                        <img src={thumbnail} alt={name} />
+                        <div className="char__name">{name}</div>
+                    </button>
                 </li>
             )
         })
@@ -94,7 +104,7 @@ class CharList extends Component {
             <div className="char__list">
                 {charList}
                 {moreLoading ? <Spinner /> : null}
-                {(error429 || loadingList || charEnded) ? null : (
+                {(error || error429 || loadingList || charEnded) ? null : (
                     <button
                         className={classButton}
                         onClick={this.onCharListMore}
@@ -113,6 +123,7 @@ CharList.propTypes = {
     onListLoaded: PropTypes.func.isRequired,
     onListError: PropTypes.func.isRequired,
     onError429: PropTypes.func.isRequired,
+    onFocusTo: PropTypes.func.isRequired,
     loadingList: PropTypes.bool.isRequired,
     error: PropTypes.bool.isRequired,
     charId: PropTypes.number.isRequired,
