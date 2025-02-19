@@ -45,14 +45,13 @@ class CharInfo extends Component {
 
     }
 
-
     onCharLoaded = (char) => {
-
         this.setState({
             char,
             loading: false
         })
     }
+
 
     onCharLoading = () => {
         this.setState({
@@ -69,19 +68,15 @@ class CharInfo extends Component {
         })
     }
 
-    setRefCurrent = elem => {
-        this.refs.current = elem
-    }
-
     render() {
         const { char, loading, error } = this.state
-        const { notCharList, comicsMax } = this.props
+        const { notCharList, comicsMax, setRefApp } = this.props
 
         const classBox = notCharList ? '' : 'char__info'
         const content = notCharList ? null
             : error ? <ErrorMessage />
                 : loading ? <Spinner />
-                    : char ? <View char={char} comicsMax={comicsMax} setRefCurrent={this.setRefCurrent} onFocusTo={this.props.onFocusTo} />
+                    : char ? <View char={char} comicsMax={comicsMax} setRefApp={setRefApp} onFocusTo={this.props.onFocusTo} />
                         : <Skeleton />
 
         return (
@@ -92,7 +87,7 @@ class CharInfo extends Component {
     }
 }
 
-const View = ({ char, comicsMax, setRefCurrent, onFocusTo }) => {
+const View = ({ char, comicsMax, setRefApp, onFocusTo }) => {
     const { id, name, description, thumbnail, homepage, wiki, comics } = char
     const qtyComics = Math.min(comics.length, comicsMax)
     comics.length = qtyComics
@@ -105,7 +100,7 @@ const View = ({ char, comicsMax, setRefCurrent, onFocusTo }) => {
                     <div className="char__info-name">{name}</div>
                     <div className="char__btns">
                         <a href={homepage}
-                            ref={link => setRefCurrent(link)}
+                            ref={link => setRefApp('CharInfo', link)}
                             className="button button__main"
                             onKeyDown={e => (e.code === 'ArrowLeft') ? onFocusTo('CharList') : null}
                         >
@@ -146,6 +141,7 @@ CharInfo.propTypes = {
     charId: PropTypes.number.isRequired,
     notCharList: PropTypes.bool.isRequired,
     onError429: PropTypes.func.isRequired,
+    setRefApp: PropTypes.func.isRequired,
     onFocusTo: PropTypes.func.isRequired,
     comicsMax: PropTypes.number
 }

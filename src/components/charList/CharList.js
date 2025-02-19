@@ -57,10 +57,6 @@ class CharList extends Component {
         }
     }
 
-    setRefCurrent = elem => {
-        this.refs.current = elem
-    }
-
     viewList = (chars) => {
         const cardsChars = chars.map(char => {
             const { id, name, thumbnail } = char
@@ -73,7 +69,7 @@ class CharList extends Component {
                     key={id}
                 >
                     <button
-                        ref={link => idSelected ? this.setRefCurrent(link) : null}
+                        ref={link => idSelected ? this.props.setRefApp('CharList', link) : null}
                         onClick={() => this.props.onCharSelected(id)}
                         onKeyDown={e => (e.code === 'ArrowRight' && idSelected) ? this.props.onFocusTo('CharInfo') : null}
                     >
@@ -123,6 +119,7 @@ CharList.propTypes = {
     onListLoaded: PropTypes.func.isRequired,
     onListError: PropTypes.func.isRequired,
     onError429: PropTypes.func.isRequired,
+    setRefApp: PropTypes.func.isRequired,
     onFocusTo: PropTypes.func.isRequired,
     loadingList: PropTypes.bool.isRequired,
     error: PropTypes.bool.isRequired,
