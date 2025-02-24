@@ -1,4 +1,5 @@
 {
+	"homepage": "https://github.com/slesareva-gala/reactGLO2025_Marvel",
 	"name": "marvel",
 	"version": "0.1.0",
 	"private": true,
@@ -13,7 +14,13 @@
 		"styled-components": "^6.1.15",
 		"web-vitals": "^4.0.0"
 	},
+	"devDependencies": {
+		"gh-pages": "^6.2.0",
+		"sass": "^1.77.2"
+	},
 	"scripts": {
+		"predeploy": "npm run build",
+		"deploy": "gh-pages -d build",
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
@@ -36,8 +43,5 @@
 			"last 1 firefox version",
 			"last 1 safari version"
 		]
-	},
-	"devDependencies": {
-		"sass": "^1.77.2"
 	}
 }
