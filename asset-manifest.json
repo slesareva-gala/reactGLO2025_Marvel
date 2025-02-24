@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/slesareva-gala/reactGLO2025_Marvel/static/css/main.a7230805.css",
-    "main.js": "/slesareva-gala/reactGLO2025_Marvel/static/js/main.e531a1ff.js",
+    "main.js": "/slesareva-gala/reactGLO2025_Marvel/static/js/main.271ad5bc.js",
     "static/media/image_not_found.webp": "/slesareva-gala/reactGLO2025_Marvel/static/media/image_not_found.68c05359794e52060c4c.webp",
     "static/media/vision.png": "/slesareva-gala/reactGLO2025_Marvel/static/media/vision.067d4ae1936d64a577ce.png",
     "static/media/mjolnir.png": "/slesareva-gala/reactGLO2025_Marvel/static/media/mjolnir.61f31e1809f12183a524.png",
@@ -9,10 +9,10 @@
     "static/media/image_not_available.webp": "/slesareva-gala/reactGLO2025_Marvel/static/media/image_not_available.3be6a10cceeb4b54c3b4.webp",
     "index.html": "/slesareva-gala/reactGLO2025_Marvel/index.html",
     "main.a7230805.css.map": "/slesareva-gala/reactGLO2025_Marvel/static/css/main.a7230805.css.map",
-    "main.e531a1ff.js.map": "/slesareva-gala/reactGLO2025_Marvel/static/js/main.e531a1ff.js.map"
+    "main.271ad5bc.js.map": "/slesareva-gala/reactGLO2025_Marvel/static/js/main.271ad5bc.js.map"
   },
   "entrypoints": [
     "static/css/main.a7230805.css",
-    "static/js/main.e531a1ff.js"
+    "static/js/main.271ad5bc.js"
   ]
 }
