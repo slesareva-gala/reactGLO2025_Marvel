@@ -1,4 +1,4 @@
-import { Component } from "react";
+import { useState, useRef } from "react";
 import AppHeader from "../appHeader/AppHeader";
 import RandomChar from "../randomChar/RandomChar";
 import CharList from "../charList/CharList";
@@ -7,94 +7,83 @@ import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
 import decoration from '../../resources/img/vision.png';
 
-class App extends Component {
-    state = {
-        loadingList: true,
-        errorList: false,
-        selectedChar: 0,
-        error429: false
+const App = () => {
+    const [loadingList, setLoadingList] = useState(true)
+    const [errorList, setErrorList] = useState(false)
+    const [selectedChar, setSelectedChar] = useState(0)
+    const [error429, setError429] = useState()
+
+    const refs = useRef({})
+
+    const onListLoaded = () => {
+        setLoadingList(false)
     }
 
-    onListLoaded = () => {
-        this.setState({
-            loadingList: false
-        })
+    const onListError = (errorMessage) => {
+        setErrorList(true)
+        setLoadingList(false)
     }
 
-    onListError = (errorMessage) => {
-        this.setState({
-            errorList: true,
-            loadingList: false
-        })
+    const onCharSelected = (id) => {
+        setSelectedChar(id)
     }
 
-    onCharSelected = (id) => {
-        this.setState({
-            selectedChar: id
-        })
+    const setRefApp = (nameRef, elem) => {
+        refs[nameRef] = elem
     }
 
-    setRefApp = (nameRef, elem) => {
-        this.refs[nameRef] = elem
-    }
-
-    onFocusTo = (nameRef) => {
-        if (this.refs[nameRef]) this.refs[nameRef].focus()
+    const onFocusTo = (nameRef) => {
+        if (refs[nameRef]) refs[nameRef].focus()
     }
 
 
-    onError429 = () => {
-        this.setState({
-            error429: true,
-            errorList: true,
-            loadingList: false
-        })
+    const onError429 = () => {
+        setError429(true)
+        setErrorList(true)
+        setLoadingList(false)
     }
 
-    render() {
-        let styleImg = { visibility: 'visible', bottom: '-130px' }
-        if (this.state.loadingList) styleImg = { ...styleImg, visibility: 'hidden' }
-        if (this.state.error429) styleImg = { ...styleImg, bottom: '-300px' }
+    let styleImg = { visibility: 'visible', bottom: '-130px' }
+    if (loadingList) styleImg = { ...styleImg, visibility: 'hidden' }
+    if (error429) styleImg = { ...styleImg, bottom: '-300px' }
 
-        return (
-            <div className="app" >
-                <AppHeader />
-                <main>
+    return (
+        <div className="app" >
+            <AppHeader />
+            <main>
+                <ErrorBoundary>
+                    <RandomChar
+                        onError429={onError429} error429={error429}
+                    />
+                </ErrorBoundary>
+                <div className="char__content">
                     <ErrorBoundary>
-                        <RandomChar
-                            stackMin={1}    // in prod 5
-                            stackLimit={5}  // in prod 10
-                            onError429={this.onError429} error429={this.state.error429}
+                        <CharList
+                            setRefApp={setRefApp} onFocusTo={onFocusTo}
+                            onListLoaded={onListLoaded}
+                            loadingList={loadingList}
+                            onListError={onListError}
+                            error={errorList}
+                            onError429={onError429} error429={error429}
+                            onCharSelected={onCharSelected}
+                            charId={selectedChar}
                         />
                     </ErrorBoundary>
-                    <div className="char__content">
-                        <ErrorBoundary>
-                            <CharList
-                                setRefApp={this.setRefApp} onFocusTo={this.onFocusTo}
-                                onListLoaded={this.onListLoaded}
-                                loadingList={this.state.loadingList}
-                                onListError={this.onListError}
-                                error={this.state.errorList}
-                                onError429={this.onError429} error429={this.state.error429}
-                                onCharSelected={this.onCharSelected}
-                                charId={this.state.selectedChar}
-                            />
-                        </ErrorBoundary>
-                        <ErrorBoundary>
-                            <CharInfo
-                                setRefApp={this.setRefApp} onFocusTo={this.onFocusTo}
-                                notCharList={this.state.loadingList || this.state.errorList}
-                                onError429={this.onError429}
-                                charId={this.state.selectedChar}
-                            />
-                        </ErrorBoundary>
-                    </div>
-                    <img className="bg-decoration" src={decoration} alt="vision" style={styleImg} />
+                    <ErrorBoundary>
+                        <CharInfo
+                            setRefApp={setRefApp} onFocusTo={onFocusTo}
+                            notCharList={loadingList || errorList}
+                            onError429={onError429}
+                            charId={selectedChar}
+                        />
+                    </ErrorBoundary>
+                </div>
+                <img className="bg-decoration" src={decoration} alt="vision" style={styleImg} />
 
-                </main >
-            </div >
-        )
-    }
+            </main >
+        </div >
+    )
+
 }
 
 export default App;

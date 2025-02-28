@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 
 import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -7,89 +7,70 @@ import MarvelBuffering from "../../services/MarvelBuffering";
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
-class RandomChar extends Component {
-    state = {
-        char: {},
-        selected: true,
-        loading: true,
-        error: false
-    }
+const stackChars = new MarvelBuffering({
+    qtyMin: 5,
+    qtyLimit: 10,
+    callbackOffset: () => Math.floor(Math.random() * 1200 + 210)
+})
 
-    stackChars = new MarvelBuffering({
-        qtyMin: this.props.stackMin,
-        qtyLimit: this.props.stackLimit,
-        callbackOffset: () => Math.floor(Math.random() * 1200 + 210),
-        callbackError: (e) => this.charsError(e)
+const RandomChar = ({ error429, onError429 }) => {
+    const [char, setChar] = useState({})
+    const [selected, setSelected] = useState(true)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+
+    stackChars.callbackError = (e) => charsError(e)
+
+    useEffect(() => onCharRender(), // eslint-disable-next-line react-hooks/exhaustive-deps
+        [])
+    useEffect(() => {
+        const timerId = setInterval(() => {
+            onCharRender()
+        }, 3000)
+        return () => clearInterval(timerId)
     })
 
-    componentDidMount() {
-        this.onCharRender()
-        this.timerId = setInterval(() => {
-            this.onCharRender()
-        }, 3000)
+    const onCharRender = () => {
+        if (!stackChars.available() || (!loading && selected)) return
+
+        const char = stackChars.get()
+        setChar(char)
+        setLoading(false)
+        setError(char === null)
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.error429 !== prevProps.error429) {
-            clearInterval(this.timerId)
-        }
+    const charsError = (e) => {
+        if (e.message === '429') onError429()
     }
 
-    componentWillUnmount() {
-        clearInterval(this.timerId)
+    const onCharSelected = () => {
+        setSelected(!selected)
     }
 
-    onCharRender = () => {
-        if (!this.stackChars.available() || (!this.state.loading && this.state.selected)) return
+    const cardChar = (error || error429) ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} selected={selected} />
+    const btnText = selected ? 'Show others' : 'I choose'
+    const btnClass = `button ${(loading || error429) ? 'button__secondary' : 'button__main'}`
 
-        const char = this.stackChars.get()
+    return (
+        <div className="randomchar">
+            {cardChar}
 
-        this.setState({
-            char,
-            loading: false,
-            error: (char === null)
-        })
-    }
-
-    charsError(e) {
-        if (e.message === '429') this.props.onError429()
-    }
-
-    onCharSelected = () => {
-        this.setState({ selected: !this.state.selected })
-    }
-
-    render() {
-        const { char, selected, loading, error } = this.state
-        const { error429 } = this.props
-
-        const cardChar = (error || error429) ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} selected={selected} />
-        const btnText = selected ? 'Show others' : 'I choose'
-        const btnClass = `button ${(loading || error429) ? 'button__secondary' : 'button__main'}`
-
-        return (
-            <div className="randomchar">
-                {cardChar}
-
-                <div className="randomchar__static">
-                    <p className="randomchar__title">
-                        Random character for today!<br />
-                        Do you want to get to know him better?
-                    </p>
-                    <p className="randomchar__title">
-                        Or choose another one
-                    </p>
-                    <button className={btnClass}>
-                        <div className="inner" onClick={this.onCharSelected}>{btnText}</div>
-                    </button>
-                    <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
-                </div>
+            <div className="randomchar__static">
+                <p className="randomchar__title">
+                    Random character for today!<br />
+                    Do you want to get to know him better?
+                </p>
+                <p className="randomchar__title">
+                    Or choose another one
+                </p>
+                <button className={btnClass}>
+                    <div className="inner" onClick={onCharSelected}>{btnText}</div>
+                </button>
+                <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
             </div>
-        )
-    }
+        </div>
+    )
 }
-
-
 
 const sliceText = (text, maxLen) => {
     let str = text.trim().replace(/\s+/g, " ") || 'no information available'
@@ -120,7 +101,6 @@ const View = ({ char, selected }) => {
             </div>
         </div>
     )
-
 }
 
 

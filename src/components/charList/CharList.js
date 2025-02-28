@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import Spinner from "../spinner/Spinner"
@@ -8,59 +8,52 @@ import MarvelService from "../../services/MarvelService";
 import './charList.scss';
 
 const charsMarvel = 1564 // на 16.02.2025
+const marvelService = new MarvelService()
 
-class CharList extends Component {
-    state = {
-        chars: [],
-        moreLoading: false,
-        offset: 210,
-        charEnded: false,
+const CharList = (props) => {
+    const [chars, setChars] = useState([])
+    const [moreLoading, setMoreLoading] = useState(false)
+    const [offset, setOffset] = useState(210)
+    const [charEnded, setCharEnded] = useState(false)
+
+    useEffect(() => {
+        if (props.loadingList || moreLoading) onRequest()
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+        [])
+
+    const onRequest = () => {
+        marvelService
+            .getAllCharacters(offset)
+            .then(onCharListLoaded)
+            .catch(onCharListError)
     }
 
-    marvelService = new MarvelService()
+    const onCharListLoaded = newChars => {
+        setChars(chars => [...chars, ...newChars])
+        setMoreLoading(false)
+        setOffset(offset => offset + 9)
+        setCharEnded(newChars.length < 9 || offset > charsMarvel - 10)
 
-    componentDidMount() {
-        this.onRequest()
+        if (props.loadingList) props.onListLoaded(false)
     }
 
-    onRequest = () => {
-        this.marvelService
-            .getAllCharacters(this.state.offset)
-            .then(this.onCharListLoaded)
-            .catch(this.onCharListError)
-    }
-
-    onCharListMore = () => {
-        this.setState({
-            moreLoading: true
-        })
-        this.onRequest()
-    }
-
-    onCharListLoaded = (newChars) => {
-        this.setState(({ chars, offset }) => ({
-            chars: [...chars, ...newChars],
-            moreLoading: false,
-            offset: offset + 9,
-            charEnded: newChars.length < 9 || offset > charsMarvel - 10
-        }))
-        if (this.props.loadingList) this.props.onListLoaded(false)
-    }
-
-    onCharListError = (e) => {
-        if (e.message === '429') this.props.onError429()
+    const onCharListError = (e) => {
+        if (e.message === '429') props.onError429()
         else {
-            this.setState({
-                moreLoading: false
-            })
-            this.props.onListError()
+            setMoreLoading(false)
+            props.onListError()
         }
     }
 
-    viewList = (chars) => {
+    const onCharListMore = () => {
+        setMoreLoading(true)
+        onRequest()
+    }
+
+    const viewList = (chars) => {
         const cardsChars = chars.map(char => {
             const { id, name, thumbnail } = char
-            const idSelected = id === this.props.charId
+            const idSelected = id === props.charId
             const classLi = `char__item ${idSelected ? 'char__item_selected' : ''}`
 
             return (
@@ -69,9 +62,9 @@ class CharList extends Component {
                     key={id}
                 >
                     <button
-                        ref={link => idSelected ? this.props.setRefApp('CharList', link) : null}
-                        onClick={() => this.props.onCharSelected(id)}
-                        onKeyDown={e => (e.code === 'ArrowRight' && idSelected) ? this.props.onFocusTo('CharInfo') : null}
+                        ref={link => idSelected ? props.setRefApp('CharList', link) : null}
+                        onClick={() => props.onCharSelected(id)}
+                        onKeyDown={e => (e.code === 'ArrowRight' && idSelected) ? props.onFocusTo('CharInfo') : null}
                     >
                         <img src={thumbnail} alt={name} />
                         <div className="char__name">{name}</div>
@@ -79,7 +72,6 @@ class CharList extends Component {
                 </li>
             )
         })
-
         return (
             <ul className="char__grid">
                 {cardsChars}
@@ -87,31 +79,28 @@ class CharList extends Component {
         )
     }
 
-    render() {
-        const { chars, moreLoading, charEnded } = this.state
-        const { loadingList, error, error429 } = this.props
+    const { loadingList, error, error429 } = props
 
-        const charList = error429 ? (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
-            : error ? <ErrorMessage /> : loadingList ? <Spinner /> : this.viewList(chars)
-        const classButton = `button ${moreLoading ? 'button__secondary' : 'button__main'} button__long`
-        const styleButton = moreLoading ? { width: 'unset' } : {}
+    const charList = error429 ? (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
+        : error ? <ErrorMessage /> : loadingList ? <Spinner /> : viewList(chars)
+    const classButton = `button ${moreLoading ? 'button__secondary' : 'button__main'} button__long`
+    const styleButton = moreLoading ? { width: 'unset' } : {}
 
-        return (
-            <div className="char__list">
-                {charList}
-                {moreLoading ? <Spinner /> : null}
-                {(error || error429 || loadingList || charEnded) ? null : (
-                    <button
-                        className={classButton}
-                        onClick={this.onCharListMore}
-                        style={styleButton}
-                    >
-                        <div className="inner">load more</div>
-                    </button>
-                )}
-            </div>
-        )
-    }
+    return (
+        <div className="char__list">
+            {charList}
+            {moreLoading ? <Spinner /> : null}
+            {(error || error429 || loadingList || charEnded) ? null : (
+                <button
+                    className={classButton}
+                    onClick={onCharListMore}
+                    style={styleButton}
+                >
+                    <div className="inner">load more</div>
+                </button>
+            )}
+        </div>
+    )
 }
 
 CharList.propTypes = {
@@ -125,7 +114,5 @@ CharList.propTypes = {
     error: PropTypes.bool.isRequired,
     charId: PropTypes.number.isRequired,
 }
-
-
 
 export default CharList;

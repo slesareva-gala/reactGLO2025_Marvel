@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import Spinner from "../spinner/Spinner"
@@ -9,82 +9,55 @@ import MarvelService from "../../services/MarvelService";
 
 import './charInfo.scss';
 
-class CharInfo extends Component {
-    static defaultProps = {
-        comicsMax: 10,
+const marvelService = new MarvelService()
+
+const CharInfo = ({ charId, notCharList, onError429, setRefApp, onFocusTo, comicsMax = 10 }) => {
+    const [char, setChar] = useState(0)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState(false)
+
+    useEffect(() => updateChar(), // eslint-disable-next-line react-hooks/exhaustive-deps
+        [charId])
+
+    const updateChar = () => {
+        if (!charId) return
+
+        onCharLoading()
+        marvelService
+            .getCharacter(charId)
+            .then(onCharLoaded)
+            .catch(onError)
     }
 
-    state = {
-        char: null,
-        loading: false,
-        error: false
+    const onCharLoaded = (char) => {
+        setChar(char)
+        setLoading(false)
     }
 
-    marvelService = new MarvelService()
-
-    componentDidMount() {
-        this.updateChar()
+    const onCharLoading = () => {
+        setLoading(true)
     }
 
-    componentDidUpdate(prevProps) {
-        if (this.props.charId !== prevProps.charId) {
-            this.updateChar()
+    const onError = (e) => {
+        if (e.message === '429') onError429()
+        else {
+            setLoading(false)
+            setError(true)
         }
     }
 
-    updateChar = () => {
-        const { charId } = this.props
+    const classBox = notCharList ? '' : 'char__info'
+    const content = notCharList ? null
+        : error ? <ErrorMessage />
+            : loading ? <Spinner />
+                : char ? <View char={char} comicsMax={comicsMax} setRefApp={setRefApp} onFocusTo={onFocusTo} />
+                    : <Skeleton />
 
-        if (!charId) return
-
-        this.onCharLoading()
-        this.marvelService
-            .getCharacter(charId)
-            .then(this.onCharLoaded)
-            .catch(this.onError)
-
-    }
-
-    onCharLoaded = (char) => {
-        this.setState({
-            char,
-            loading: false
-        })
-    }
-
-
-    onCharLoading = () => {
-        this.setState({
-            loading: true,
-        })
-    }
-
-
-    onError = (e) => {
-        if (e.message === '429') this.props.onError429()
-        else this.setState({
-            loading: false,
-            error: true
-        })
-    }
-
-    render() {
-        const { char, loading, error } = this.state
-        const { notCharList, comicsMax, setRefApp } = this.props
-
-        const classBox = notCharList ? '' : 'char__info'
-        const content = notCharList ? null
-            : error ? <ErrorMessage />
-                : loading ? <Spinner />
-                    : char ? <View char={char} comicsMax={comicsMax} setRefApp={setRefApp} onFocusTo={this.props.onFocusTo} />
-                        : <Skeleton />
-
-        return (
-            <div className={classBox}>
-                {content}
-            </div>
-        )
-    }
+    return (
+        <div className={classBox}>
+            {content}
+        </div>
+    )
 }
 
 const View = ({ char, comicsMax, setRefApp, onFocusTo }) => {

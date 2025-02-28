@@ -13,10 +13,15 @@ class MarvelBuffering {
         this._qtyMin = Math.max(1, qtyMin)
         this._qtyLimit = Math.min(100, Math.max(1, qtyLimit))
 
-        this.marvelService = new MarvelService()
-        this.callbackOffset = callbackOffset
-        this.callbackError = callbackError
+        this._marvelService = new MarvelService()
+        this._callbackOffset = callbackOffset
+        this._callbackError = callbackError
     }
+
+    set callbackOffset(callback) { if (typeof (callback) === 'function') this._callbackOffset = callback }
+    get callbackOffset() { return this._callbackOffset }
+    set callbackError(callback) { if (typeof (callback) === 'function') this._callbackError = callback }
+    get callbackError() { return this._callbackError }
 
     available() {
         const { _chars, _qtyExpected, _qtyMin, _qtyLimit } = this
@@ -43,7 +48,7 @@ class MarvelBuffering {
 
     updateChars(limit) {
         const offset = this.callbackOffset()
-        this.marvelService
+        this._marvelService
             .getAllCharacters(offset, limit)
             .then((chars) => this.set(chars))
             .catch((e) => this.error(e))
