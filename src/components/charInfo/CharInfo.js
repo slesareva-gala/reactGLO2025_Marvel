@@ -5,16 +5,14 @@ import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
 
-import MarvelService from "../../services/MarvelService";
+import { useMarvelService } from "../../services/MarvelService";
 
 import './charInfo.scss';
 
-const marvelService = new MarvelService()
-
-const CharInfo = ({ charId, notCharList, onError429, setRefApp, onFocusTo, comicsMax = 10 }) => {
+const CharInfo = ({ charId, setRefApp, onFocusTo, comicsMax = 10 }) => {
     const [char, setChar] = useState(0)
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(false)
+
+    const { loading, error, clearError, getCharacter } = useMarvelService()
 
     useEffect(() => updateChar(), // eslint-disable-next-line react-hooks/exhaustive-deps
         [charId])
@@ -22,39 +20,22 @@ const CharInfo = ({ charId, notCharList, onError429, setRefApp, onFocusTo, comic
     const updateChar = () => {
         if (!charId) return
 
-        onCharLoading()
-        marvelService
-            .getCharacter(charId)
+        clearError()
+        getCharacter(charId)
             .then(onCharLoaded)
-            .catch(onError)
     }
 
     const onCharLoaded = (char) => {
         setChar(char)
-        setLoading(false)
     }
 
-    const onCharLoading = () => {
-        setLoading(true)
-    }
-
-    const onError = (e) => {
-        if (e.message === '429') onError429()
-        else {
-            setLoading(false)
-            setError(true)
-        }
-    }
-
-    const classBox = notCharList ? '' : 'char__info'
-    const content = notCharList ? null
-        : error ? <ErrorMessage />
-            : loading ? <Spinner />
-                : char ? <View char={char} comicsMax={comicsMax} setRefApp={setRefApp} onFocusTo={onFocusTo} />
-                    : <Skeleton />
+    const content = error ? <ErrorMessage />
+        : loading ? <Spinner />
+            : char ? <View char={char} comicsMax={comicsMax} setRefApp={setRefApp} onFocusTo={onFocusTo} />
+                : <Skeleton />
 
     return (
-        <div className={classBox}>
+        <div className="char__info">
             {content}
         </div>
     )
@@ -112,8 +93,6 @@ const View = ({ char, comicsMax, setRefApp, onFocusTo }) => {
 
 CharInfo.propTypes = {
     charId: PropTypes.number.isRequired,
-    notCharList: PropTypes.bool.isRequired,
-    onError429: PropTypes.func.isRequired,
     setRefApp: PropTypes.func.isRequired,
     onFocusTo: PropTypes.func.isRequired,
     comicsMax: PropTypes.number

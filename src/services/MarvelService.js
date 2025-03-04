@@ -1,40 +1,36 @@
+import { useHttp } from '../hooks/http.hook'
+
 import imgNotFound from "../resources/img/image_not_found.webp"
 import imgNotAvailbale from "../resources/img/image_not_available.webp"
 
-class MarvelService {
-    _apiBase = 'https://gateway.marvel.com:443/v1/public/'
-    _apikey = `apikey=${process.env.REACT_APP_MARVEL_API_KEY}`
+export const useMarvelService = () => {
+    const { loading, request, error, clearError, codeError } = useHttp()
 
-    getResource = async (url) => {
-        let res = await fetch(url)
+    const _apiBase = 'https://gateway.marvel.com:443/v1/public/'
+    const _apikey = `apikey=${process.env.REACT_APP_MARVEL_API_KEY}`
+    const charsMarvel = 1564 // на 16.02.2025
 
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`)
-        }
-        return await res.json()
-    }
+    const getAllCharacters = async (offset = 210, limit = 9) => {
+        if (offset > charsMarvel - 1) return []
 
-
-    getAllCharacters = async (offset, limit = 9) => {
         try {
-            const res = await this.getResource(`${this._apiBase}characters?limit=${limit}&offset=${offset}&${this._apikey}`)
-            return res.data.results.map(this._transformCharacter)
+            const res = await request(`${_apiBase}characters?limit=${limit}&offset=${offset}&${_apikey}`)
+            return res.data.results.map(_transformCharacter)
         } catch (e) {
-            throw new Error(e.message.match(/(?<=status:\s*)\d{3}/g)[0])
+            return []
         }
     }
 
-    getCharacter = async (id) => {
+    const getCharacter = async (id) => {
         try {
-            const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apikey} `)
-            return this._transformCharacter(res.data.results[0])
+            const res = await request(`${_apiBase}characters/${id}?${_apikey} `)
+            return res ? _transformCharacter(res.data.results[0]) : null
         } catch (e) {
-            throw new Error(e.message.match(/(?<=status:\s*)\d{3}/g)[0])
+            return null
         }
-
     }
 
-    _transformCharacter = (char) => {
+    const _transformCharacter = (char) => {
         const { id, name, description, thumbnail, urls } = char
 
         const srcThumbnail = thumbnail.path.includes('image_not_available') ? imgNotFound
@@ -52,6 +48,5 @@ class MarvelService {
         }
     }
 
+    return { loading, error, clearError, codeError, getCharacter, getAllCharacters, charsMarvel }
 }
-
-export default MarvelService

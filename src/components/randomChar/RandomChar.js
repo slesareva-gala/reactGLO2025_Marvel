@@ -2,54 +2,45 @@ import { useState, useEffect } from 'react';
 
 import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
-import MarvelBuffering from "../../services/MarvelBuffering";
+import { useMarvelBuffering } from "../../services/MarvelBuffering";
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
-const stackChars = new MarvelBuffering({
-    qtyMin: 5,
-    qtyLimit: 10,
-    callbackOffset: () => Math.floor(Math.random() * 1200 + 210)
-})
 
-const RandomChar = ({ error429, onError429 }) => {
-    const [char, setChar] = useState({})
+const RandomChar = () => {
+    const [char, setChar] = useState(null)
     const [selected, setSelected] = useState(true)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(false)
 
-    stackChars.callbackError = (e) => charsError(e)
+    const { loading, error, getBuffer } = useMarvelBuffering({
+        qtyMin: 3,
+        qtyLimit: 10,
+        callbackOffset: () => Math.floor(Math.random() * 1200 + 210)
+    })
 
-    useEffect(() => onCharRender(), // eslint-disable-next-line react-hooks/exhaustive-deps
-        [])
     useEffect(() => {
-        const timerId = setInterval(() => {
-            onCharRender()
-        }, 3000)
+        onCharRender()
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+        [loading, selected])
+
+    useEffect(() => {
+        const timerId = setInterval(() => onCharRender(), 3000)
         return () => clearInterval(timerId)
     })
 
     const onCharRender = () => {
-        if (!stackChars.available() || (!loading && selected)) return
+        if ((selected && char) || error) return
 
-        const char = stackChars.get()
-        setChar(char)
-        setLoading(false)
-        setError(char === null)
-    }
-
-    const charsError = (e) => {
-        if (e.message === '429') onError429()
+        setChar(getBuffer())
     }
 
     const onCharSelected = () => {
-        setSelected(!selected)
+        setSelected(selected => !selected)
     }
 
-    const cardChar = (error || error429) ? <ErrorMessage /> : loading ? <Spinner /> : <View char={char} selected={selected} />
+    const cardChar = loading ? <Spinner /> : (error || char === null) ? <ErrorMessage /> : <View char={char} selected={selected} />
     const btnText = selected ? 'Show others' : 'I choose'
-    const btnClass = `button ${(loading || error429) ? 'button__secondary' : 'button__main'}`
+    const btnClass = `button ${(loading || error) ? 'button__secondary' : 'button__main'}`
 
     return (
         <div className="randomchar">
@@ -63,8 +54,8 @@ const RandomChar = ({ error429, onError429 }) => {
                 <p className="randomchar__title">
                     Or choose another one
                 </p>
-                <button className={btnClass}>
-                    <div className="inner" onClick={onCharSelected}>{btnText}</div>
+                <button className={btnClass} onClick={onCharSelected}>
+                    <div className="inner" >{btnText}</div>
                 </button>
                 <img src={mjolnir} alt="mjolnir" className="randomchar__decoration" />
             </div>

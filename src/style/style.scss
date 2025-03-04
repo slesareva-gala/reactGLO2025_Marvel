@@ -57,7 +57,6 @@ input::-webkit-inner-spin-button {
     position: relative;
     .bg-decoration {
         position: absolute;
-        visibility: hidden;
         right: -174px;
         top: unset;
         bottom: -130px;
@@ -68,6 +67,7 @@ input::-webkit-inner-spin-button {
 main {
     margin-top: 50px;    
     position: relative;
+    min-height: 850px;
 }
 
 .pulse {
