@@ -10,7 +10,7 @@ import './charList.scss';
 
 const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
     const [chars, setChars] = useState([])
-    const [offset, setOffset] = useState(210)
+    const [offset, setOffset] = useState(110)
     const [charEnded, setCharEnded] = useState(false)
 
     const { loading, error, getAllCharacters, charsMarvel, codeError } = useMarvelService()
@@ -29,10 +29,6 @@ const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
         setChars(chars => [...chars, ...newChars])
         setOffset(offset => offset + 9)
         setCharEnded(newChars.length < 9 || offset > charsMarvel - 10)
-    }
-
-    const onCharListMore = () => {
-        onRequest()
     }
 
     const viewList = (chars) => {
@@ -76,7 +72,7 @@ const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
             {(error || loading || charEnded) ? null : (
                 <button
                     className={classButton}
-                    onClick={onCharListMore}
+                    onClick={onRequest}
                     style={styleButton}
                 >
                     <div className="inner">load more</div>

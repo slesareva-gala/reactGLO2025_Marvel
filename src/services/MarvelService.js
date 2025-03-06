@@ -9,6 +9,7 @@ export const useMarvelService = () => {
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/'
     const _apikey = `apikey=${process.env.REACT_APP_MARVEL_API_KEY}`
     const charsMarvel = 1564 // на 16.02.2025
+    const comicsMarvel = 1000 // ???
 
     const getAllCharacters = async (offset = 210, limit = 9) => {
         if (offset > charsMarvel - 1) return []
@@ -30,6 +31,24 @@ export const useMarvelService = () => {
         }
     }
 
+    const getAllComics = async (offset = 0) => {
+        try {
+            const res = await request(`${_apiBase}comics?orderBy=issueNumber&limit=8&offset=${offset}&${_apikey}`)
+            return res.data.results.map(_transformComics)
+        } catch (e) {
+            return []
+        }
+    }
+
+    const getComics = async (id) => {
+        try {
+            const res = await request(`${_apiBase}comics/${id}?${_apikey}`)
+            return _transformComics(res.data.results[0])
+        } catch (e) {
+            return []
+        }
+    }
+
     const _transformCharacter = (char) => {
         const { id, name, description, thumbnail, urls } = char
 
@@ -48,5 +67,28 @@ export const useMarvelService = () => {
         }
     }
 
-    return { loading, error, clearError, codeError, getCharacter, getAllCharacters, charsMarvel }
+    const _transformComics = (comics) => {
+        const { id, title, description, pageCount, thumbnail, prices } = comics
+
+        return {
+            id,
+            title,
+            description: description || "The description is missing",
+            pageCount: pageCount
+                ? `${pageCount} p.`
+                : "No information about the number of pages",
+            thumbnail: `${thumbnail.path}.${thumbnail.extension}`,
+            language: comics.textObjects[0]?.language || "en-us",
+            price: prices[0].price
+                ? `${prices[0].price} $`
+                : "not available",
+        }
+    }
+
+    return {
+        charsMarvel, comicsMarvel, loading,
+        error, clearError, codeError,
+        getCharacter, getAllCharacters,
+        getAllComics, getComics
+    }
 }

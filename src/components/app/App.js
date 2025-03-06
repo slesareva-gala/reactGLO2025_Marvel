@@ -5,6 +5,8 @@ import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
+import CommicList from "../comicsList/ComicsList";
+
 import decoration from '../../resources/img/vision.png';
 
 const App = () => {
@@ -29,6 +31,9 @@ const App = () => {
             <AppHeader />
             <main>
                 <ErrorBoundary>
+                    <CommicList />
+                </ErrorBoundary>
+                {/* <ErrorBoundary>
                     <RandomChar />
                 </ErrorBoundary>
                 <div className="char__content">
@@ -46,7 +51,7 @@ const App = () => {
                         />
                     </ErrorBoundary>
                 </div>
-                <img className="bg-decoration" src={decoration} alt="vision" />
+                <img className="bg-decoration" src={decoration} alt="vision" /> */}
 
             </main >
         </div >
