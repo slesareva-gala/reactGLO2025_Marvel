@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from "react-router-dom"
 import PropTypes from 'prop-types';
 
 import Spinner from "../spinner/Spinner"
@@ -61,7 +62,7 @@ const View = ({ char, comicsMax, setRefApp, onFocusTo }) => {
                             <div className="inner">homepage</div>
                         </a>
                         <a href={wiki}
-                            className="button button__secondary"
+                            className="button button__main"
                             onKeyDown={e => (e.code === 'ArrowLeft') ? onFocusTo('CharList') : null}
                         >
                             <div className="inner">Wiki</div>
@@ -77,9 +78,13 @@ const View = ({ char, comicsMax, setRefApp, onFocusTo }) => {
                 {qtyComics > 0 ? null : 'There is no comics with this character'}
                 {
                     comics.map((item, i) => {
+                        const id = item.resourceURI.match(/\d+$/)[0]
+
                         return (
                             <li className="char__comics-item" key={i}>
-                                {item.name}
+                                <Link to={`/comics/${id}`}>
+                                    {item.name}
+                                </Link>
                             </li>
 
                         )

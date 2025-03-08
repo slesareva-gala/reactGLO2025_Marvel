@@ -23,7 +23,9 @@
             li {
                 margin: 0 8px;
                 a:hover {
-                    color: $main-color;
+                    text-decoration-style: solid;
+                    text-decoration-color:$main-color;
+                    text-decoration-line: underline;
                 }
             }
         }

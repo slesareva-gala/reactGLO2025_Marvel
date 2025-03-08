@@ -1,60 +1,33 @@
-import { useState, useRef } from "react";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
 import AppHeader from "../appHeader/AppHeader";
-import RandomChar from "../randomChar/RandomChar";
-import CharList from "../charList/CharList";
-import CharInfo from "../charInfo/CharInfo";
-import ErrorBoundary from "../errorBoundary/ErrorBoundary";
-
-import CommicList from "../comicsList/ComicsList";
-
-import decoration from '../../resources/img/vision.png';
+import { MainPage, ComicsPage, SingleComicPage, Page404 } from '../pages'
 
 const App = () => {
-    const [selectedChar, setSelectedChar] = useState(0)
 
-    const refs = useRef({})
-
-    const onCharSelected = (id) => {
-        setSelectedChar(id)
-    }
-
-    const setRefApp = (nameRef, elem) => {
-        refs[nameRef] = elem
-    }
-
-    const onFocusTo = (nameRef) => {
-        if (refs[nameRef]) refs[nameRef].focus()
-    }
 
     return (
-        <div className="app" >
-            <AppHeader />
-            <main>
-                <ErrorBoundary>
-                    <CommicList />
-                </ErrorBoundary>
-                {/* <ErrorBoundary>
-                    <RandomChar />
-                </ErrorBoundary>
-                <div className="char__content">
-                    <ErrorBoundary>
-                        <CharList
-                            setRefApp={setRefApp} onFocusTo={onFocusTo}
-                            onCharSelected={onCharSelected}
-                            charId={selectedChar}
-                        />
-                    </ErrorBoundary>
-                    <ErrorBoundary>
-                        <CharInfo
-                            setRefApp={setRefApp} onFocusTo={onFocusTo}
-                            charId={selectedChar}
-                        />
-                    </ErrorBoundary>
-                </div>
-                <img className="bg-decoration" src={decoration} alt="vision" /> */}
-
-            </main >
-        </div >
+        <Router>
+            <div className="app" >
+                <AppHeader />
+                <main>
+                    <Switch>
+                        <Route exact path="/">
+                            <MainPage />
+                        </Route>
+                        <Route exact path="/comics">
+                            <ComicsPage />
+                        </Route>
+                        <Route exact path="/comics/:comicId">
+                            <SingleComicPage />
+                        </Route>
+                        <Route path="*">
+                            <Page404 />
+                        </Route>
+                    </Switch>
+                </main >
+            </div >
+        </Router>
     )
 }
 
