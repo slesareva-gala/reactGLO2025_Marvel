@@ -11,6 +11,7 @@ export const useHttp = () => {
             headers = { 'Content-Type': 'application/json' }) => {
 
             setLoading(true)
+            setError(null)
             try {
                 const response = await fetch(url, { method, body, headers })
 
@@ -32,9 +33,7 @@ export const useHttp = () => {
             }
         }, [])
 
-    const clearError = useCallback(() => setError(null), [])
-
     const codeError = useCallback((eMessage) => eMessage.match(/(?<=status:\s*)\d{3}/g)[0], [])
 
-    return { loading, request, error, clearError, codeError }
+    return { loading, request, error, codeError }
 }

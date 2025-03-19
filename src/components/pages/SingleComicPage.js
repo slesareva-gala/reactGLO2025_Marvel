@@ -12,7 +12,7 @@ const SingleComicPage = () => {
     const { comicId } = useParams()
     const [comic, setComic] = useState(null)
 
-    const { loading, error, clearError, getComic } = useMarvelService()
+    const { loading, error, getComic } = useMarvelService()
 
     useEffect(() => updateComic(), // eslint-disable-next-line react-hooks/exhaustive-deps
         [comicId])
@@ -20,7 +20,6 @@ const SingleComicPage = () => {
     const updateComic = () => {
         if (!comicId) return
 
-        clearError()
         getComic(comicId)
             .then(onComicLoaded)
     }

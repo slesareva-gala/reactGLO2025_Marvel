@@ -27,7 +27,7 @@ export const useMarvelBuffering = ({
         const bufferLength = _chars.current.length
         const char = bufferLength ? _chars.current[bufferLength - 1] : null
 
-        if (!error && (bufferLength + _qtyExpected.current) < _qtyMin) {
+        if ((bufferLength + _qtyExpected.current) < _qtyMin) {
 
             setLoading(bufferLength < 1)
             updateBuffer()

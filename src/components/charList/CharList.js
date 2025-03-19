@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
 import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -9,11 +10,11 @@ import './charList.scss';
 
 
 const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
-    const [chars, setChars] = useState([])
-    const [offset, setOffset] = useState(110)
-    const [charEnded, setCharEnded] = useState(false)
+    const { loading, error, getAllCharacters, charsMarvel, codeError, offsetCharsBerginMarvel } = useMarvelService()
 
-    const { loading, error, getAllCharacters, charsMarvel, codeError } = useMarvelService()
+    const [chars, setChars] = useState([])
+    const [offset, setOffset] = useState(offsetCharsBerginMarvel)
+
 
     useEffect(() => {
         onRequest()
@@ -26,9 +27,9 @@ const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
     }
 
     const onCharListLoaded = newChars => {
-        setChars(chars => [...chars, ...newChars])
-        setOffset(offset => offset + 9)
-        setCharEnded(newChars.length < 9 || offset > charsMarvel - 10)
+        setChars(chars => [...chars,
+        ...newChars.filter(obj1 => chars.findIndex(obj2 => (obj2.id === obj1.id)) < 0)])
+        setOffset(offset + 9)
     }
 
     const viewList = (chars) => {
@@ -38,38 +39,44 @@ const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
             const classLi = `char__item ${idSelected ? 'char__item_selected' : ''}`
 
             return (
-                <li
-                    className={classLi}
-                    key={id}
-                >
-                    <button
-                        ref={link => idSelected ? setRefApp('CharList', link) : null}
-                        onClick={() => onCharSelected(id)}
-                        onKeyDown={e => (e.code === 'ArrowRight' && idSelected) ? onFocusTo('CharInfo') : null}
+                <CSSTransition key={id} timeout={300} classNames="char__item">
+                    <li
+                        className={classLi}
+                        key={id}
                     >
-                        <img src={thumbnail} alt={name} />
-                        <div className="char__name">{name}</div>
-                    </button>
-                </li>
+                        <button
+                            ref={link => idSelected ? setRefApp('CharList', link) : null}
+                            onClick={() => onCharSelected(id)}
+                            onKeyDown={e => (e.code === 'ArrowRight' && idSelected) ? onFocusTo('CharInfo') : null}
+                        >
+                            <img src={thumbnail} alt={name} />
+                            <div className="char__name">{name}</div>
+                        </button>
+                    </li>
+                </CSSTransition>
             )
         })
         return (
             <ul className="char__grid">
-                {cardsChars}
+                <TransitionGroup component={null}>
+                    {cardsChars}
+                </TransitionGroup>
             </ul>
         )
     }
 
-    const charList = (error && codeError(error) === '429') ? (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
-        : error ? <ErrorMessage /> : viewList(chars)
+    const isError429 = error && codeError(error) === '429'
+    const charsError = isError429 ? (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
+        : error ? <ErrorMessage /> : null
     const classButton = `button ${loading ? 'button__secondary' : 'button__main'} button__long`
     const styleButton = loading ? { width: 'unset' } : {}
 
     return (
         <div className="char__list">
-            {charList}
+            {viewList(chars)}
+            {charsError}
             {loading ? <Spinner /> : null}
-            {(error || loading || charEnded) ? null : (
+            {(isError429 || loading || offset > charsMarvel - 1) ? null : (
                 <button
                     className={classButton}
                     onClick={onRequest}

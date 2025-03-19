@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 
 import Spinner from "../spinner/Spinner"
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -8,7 +8,7 @@ import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
 
-const RandomChar = () => {
+const RandomChar = memo(() => {
     const [char, setChar] = useState(null)
     const [selected, setSelected] = useState(true)
 
@@ -29,7 +29,7 @@ const RandomChar = () => {
     })
 
     const onCharRender = () => {
-        if ((selected && char) || error) return
+        if (selected && char) return
 
         setChar(getBuffer())
     }
@@ -61,7 +61,7 @@ const RandomChar = () => {
             </div>
         </div>
     )
-}
+})
 
 const sliceText = (text, maxLen) => {
     let str = text.trim().replace(/\s+/g, " ") || 'no information available'

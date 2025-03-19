@@ -4,14 +4,15 @@ import imgNotFound from "../resources/img/image_not_found.webp"
 import imgNotAvailbale from "../resources/img/image_not_available.webp"
 
 export const useMarvelService = () => {
-    const { loading, request, error, clearError, codeError } = useHttp()
+    const { loading, request, error, codeError } = useHttp()
 
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/'
     const _apikey = `apikey=${process.env.REACT_APP_MARVEL_API_KEY}`
     const charsMarvel = 1564 // на 16.02.2025
+    const offsetCharsBerginMarvel = 196
     const comicsMarvel = 1000 // ???
 
-    const getAllCharacters = async (offset = 210, limit = 9) => {
+    const getAllCharacters = async (offset = offsetCharsBerginMarvel, limit = 9) => {
         if (offset > charsMarvel - 1) return []
 
         try {
@@ -31,9 +32,9 @@ export const useMarvelService = () => {
         }
     }
 
-    const getAllComics = async (offset = 0) => {
+    const getAllComics = async (offset = 0, limit = 8) => {
         try {
-            const res = await request(`${_apiBase}comics?orderBy=issueNumber&limit=8&offset=${offset}&${_apikey}`)
+            const res = await request(`${_apiBase}comics?orderBy=issueNumber&limit=${limit}&offset=${offset}&${_apikey}`)
             return res.data.results.map(_transformComics)
         } catch (e) {
             return []
@@ -86,8 +87,9 @@ export const useMarvelService = () => {
     }
 
     return {
-        charsMarvel, comicsMarvel, loading,
-        error, clearError, codeError,
+        charsMarvel, comicsMarvel, offsetCharsBerginMarvel,
+        loading,
+        error, codeError,
         getCharacter, getAllCharacters,
         getAllComics, getComic
     }

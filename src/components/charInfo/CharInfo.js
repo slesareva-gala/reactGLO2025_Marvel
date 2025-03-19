@@ -13,7 +13,7 @@ import './charInfo.scss';
 const CharInfo = ({ charId, setRefApp, onFocusTo, comicsMax = 10 }) => {
     const [char, setChar] = useState(0)
 
-    const { loading, error, clearError, getCharacter } = useMarvelService()
+    const { loading, error, getCharacter } = useMarvelService()
 
     useEffect(() => updateChar(), // eslint-disable-next-line react-hooks/exhaustive-deps
         [charId])
@@ -21,7 +21,6 @@ const CharInfo = ({ charId, setRefApp, onFocusTo, comicsMax = 10 }) => {
     const updateChar = () => {
         if (!charId) return
 
-        clearError()
         getCharacter(charId)
             .then(onCharLoaded)
     }
@@ -81,7 +80,9 @@ const View = ({ char, comicsMax, setRefApp, onFocusTo }) => {
                         const id = item.resourceURI.match(/\d+$/)[0]
 
                         return (
-                            <li className="char__comics-item" key={i}>
+                            <li className="char__comics-item" key={i}
+                                onKeyDown={e => (e.code === 'ArrowLeft') ? onFocusTo('CharList') : null}
+                            >
                                 <Link to={`/comics/${id}`}>
                                     {item.name}
                                 </Link>
