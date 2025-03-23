@@ -8,7 +8,7 @@ export const useMarvelBuffering = ({
     callbackOffset = () => 0
 }) => {
     const [loading, setLoading] = useState(true)
-    const { getAllCharacters, error } = useMarvelService()
+    const { getAllCharacters, error, charsMarvel, offsetCharsBeginMarvel } = useMarvelService()
 
     const _chars = useRef([])
     const _qtyExpected = useRef(0)
@@ -48,5 +48,5 @@ export const useMarvelBuffering = ({
             .catch((e) => setBuffer(null))
     }
 
-    return { loading, error, getBuffer }
+    return { loading, error, getBuffer, charsMarvel, offsetCharsBeginMarvel }
 }

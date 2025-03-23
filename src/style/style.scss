@@ -56,10 +56,8 @@ input::-webkit-inner-spin-button {
     padding: 50px 0 50px 0;
     position: relative;
     .bg-decoration {
-        position: absolute;
-        right: -174px;
-        top: unset;
-        bottom: -130px;
+        position: relative;
+        top: 20px;
         z-index: -1;
     }
 }

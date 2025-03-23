@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 import RandomChar from "../randomChar/RandomChar";
 import CharList from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
+import CharSearchForm from '../charSearchForm/CharSearchForm';
 
 import ErrorBoundary from "../errorBoundary/ErrorBoundary";
 
@@ -38,14 +39,19 @@ const MainPage = () => {
                         charId={selectedChar}
                     />
                 </ErrorBoundary>
-                <ErrorBoundary>
-                    <CharInfo
-                        setRefApp={setRefApp} onFocusTo={onFocusTo}
-                        charId={selectedChar}
-                    />
-                </ErrorBoundary>
+                <div>
+                    <ErrorBoundary>
+                        <CharInfo
+                            setRefApp={setRefApp} onFocusTo={onFocusTo}
+                            charId={selectedChar}
+                        />
+                    </ErrorBoundary>
+                    <ErrorBoundary>
+                        <CharSearchForm />
+                    </ErrorBoundary>
+                    <img className="bg-decoration" src={decoration} alt="vision" />
+                </div>
             </div>
-            <img className="bg-decoration" src={decoration} alt="vision" />
         </>
     )
 }

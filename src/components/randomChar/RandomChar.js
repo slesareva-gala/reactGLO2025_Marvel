@@ -12,10 +12,10 @@ const RandomChar = memo(() => {
     const [char, setChar] = useState(null)
     const [selected, setSelected] = useState(true)
 
-    const { loading, error, getBuffer } = useMarvelBuffering({
+    const { loading, error, getBuffer, charsMarvel, offsetCharsBeginMarvel } = useMarvelBuffering({
         qtyMin: 3,
         qtyLimit: 10,
-        callbackOffset: () => Math.floor(Math.random() * 1200 + 210)
+        callbackOffset: () => Math.floor(Math.random() * (charsMarvel - 10 - offsetCharsBeginMarvel) + offsetCharsBeginMarvel)
     })
 
     useEffect(() => {
