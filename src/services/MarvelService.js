@@ -8,6 +8,7 @@ export const useMarvelService = () => {
 
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/'
     const _apiKey = `apikey=${process.env.REACT_APP_MARVEL_API_KEY}`
+
     const charsMarvel = 1564 // на 16.02.2025
     const offsetCharsBeginMarvel = 196
     const comicsMarvel = 1000 // ???
