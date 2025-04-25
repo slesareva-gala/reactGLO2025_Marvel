@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import { useMarvelService } from '../../services/MarvelService';
-import Spinner from '../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 
 import './comicsList.scss';
 
@@ -10,7 +9,7 @@ const ComicsList = () => {
     const [comics, setComics] = useState([]);
     const [offset, setOffset] = useState(0);
 
-    const { loading, error, getAllComics, comicsMarvel, codeError } = useMarvelService();
+    const { processing, setProcessing, getAllComics, comicsMarvel } = useMarvelService();
 
     useEffect(() => {
         onRequest();
@@ -21,6 +20,7 @@ const ComicsList = () => {
 
         getAllComics(offset)
             .then(onComicsListLoaded)
+            .then(() => setProcessing('confirmed'))
     }
 
     const onComicsListLoaded = (newComics) => {
@@ -50,18 +50,26 @@ const ComicsList = () => {
         )
     }
 
-    const isError429 = error && codeError(error) === '429'
-    const comicsError = isError429 ? (<span className="comics__error_message">You have exceeded your rate limit.  Please try again later.</span>)
-        : error ? <ErrorMessage /> : null
-    const classButton = `button ${loading ? 'button__secondary' : 'button__main'} button__long`
-    const styleButton = loading ? { width: 'unset' } : {}
+    const setContentCust = (processing) => {
+
+        switch (processing) {
+            case 'confirmed':
+                return null
+            case 'error429':
+                return (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
+            default:
+                return setContent(processing)
+        }
+    }
+
+    const classButton = `button ${processing === 'loading' ? 'button__secondary' : 'button__main'} button__long`
+    const styleButton = processing === 'loading' ? { width: 'unset' } : {}
 
     return (
         <div className="comics__list">
             {viewList(comics)}
-            {comicsError}
-            {loading ? <Spinner /> : null}
-            {(isError429 || loading || offset > comicsMarvel - 1) ? null : (
+            {setContentCust(processing)}
+            {(processing === 'error429' || processing === 'loading' || offset > comicsMarvel - 1) ? null : (
                 <button
                     className={classButton}
                     onClick={onRequest}

@@ -4,14 +4,13 @@ import * as Yup from 'yup';
 import { Link } from 'react-router-dom';
 
 import { useMarvelService } from '../../services/MarvelService';
-import Spinner from "../spinner/Spinner"
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 
 import './charSearchForm.scss';
 
 const CharSearchForm = () => {
     const [char, setChar] = useState(null);
-    const { loading, error, getCharacterByName } = useMarvelService();
+    const { processing, setProcessing, getCharacterByName } = useMarvelService();
 
     const onCharLoaded = (char) => {
         setChar(char);
@@ -19,22 +18,40 @@ const CharSearchForm = () => {
 
     const updateChar = (name) => {
         getCharacterByName(name)
-            .then(onCharLoaded);
+            .then(onCharLoaded)
+            .then(() => setProcessing('confirmed'))
     }
 
-    const results = error ? <div className="char__search-critical-error"><ErrorMessage /></div>
-        : !char ? null
-            : char.length > 0 ?
-                <div className="char__search-wrapper">
-                    <div className="char__search-success">There is! Visit {char[0].name} page?</div>
-                    <Link to={`/characters/${char[0].id}`} className="button button__main">
-                        <div className="inner">To page</div>
-                    </Link>
-                </div>
-                : <div className="char__search-error">
-                    The character was not found. Check the name and try again
-                </div>
-    const btnClass = `button ${(loading || error) ? 'button__secondary' : 'button__main'}`
+    const setContentCust = (processing) => {
+        if (processing === 'confirmed' && !char.length) processing = "notfound"
+
+        switch (processing) {
+            case 'waiting':
+                return null
+            case 'clear':
+                return null
+            case 'notfound':
+                return (
+                    <div className="char__search-error">
+                        The character was not found. Check the name and try again
+                    </div>
+                )
+            case 'confirmed':
+                return (
+                    <div className="char__search-wrapper">
+                        <div className="char__search-success">There is! Visit {char[0].name} page?</div>
+                        <Link to={`/characters/${char[0].id}`} className="button button__main">
+                            <div className="inner">To page</div>
+                        </Link>
+                    </div>
+                )
+            default:
+                return setContent(processing)
+        }
+    }
+
+    const btnClass = `button ${(processing === 'confirmed'
+        || processing === 'loading' || processing.includes('error')) ? 'button__secondary' : 'button__main'}`
 
     return (
         <div className="char__search-form">
@@ -56,7 +73,9 @@ const CharSearchForm = () => {
                             id="charName"
                             name='charName'
                             type='text'
-                            placeholder="Enter name" />
+                            placeholder="Enter name"
+                            onInput={e => setProcessing('clear')}
+                        />
                         <button
                             type='submit'
                             className={btnClass}>
@@ -66,8 +85,7 @@ const CharSearchForm = () => {
                     <FormikErrorMessage component="div" className="char__search-error" name="charName" />
                 </Form>
             </Formik>
-            {loading ? <Spinner /> : null}
-            {results}
+            {setContentCust(processing)}
         </div>
     )
 }

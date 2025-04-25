@@ -2,19 +2,17 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 
-import Spinner from "../spinner/Spinner"
-import ErrorMessage from '../errorMessage/ErrorMessage';
 import { useMarvelService } from "../../services/MarvelService";
+import setContent from '../../utils/setContent';
 
 import './charList.scss';
 
 
 const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
-    const { loading, error, getAllCharacters, charsMarvel, codeError, offsetCharsBerginMarvel } = useMarvelService()
+    const { processing, setProcessing, getAllCharacters, charsMarvel, offsetCharsBeginMarvel } = useMarvelService()
 
     const [chars, setChars] = useState([])
-    const [offset, setOffset] = useState(offsetCharsBerginMarvel)
-
+    const [offset, setOffset] = useState(offsetCharsBeginMarvel)
 
     useEffect(() => {
         onRequest()
@@ -24,6 +22,7 @@ const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
     const onRequest = () => {
         getAllCharacters(offset)
             .then(onCharListLoaded)
+            .then(() => setProcessing('confirmed'))
     }
 
     const onCharListLoaded = newChars => {
@@ -65,18 +64,25 @@ const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
         )
     }
 
-    const isError429 = error && codeError(error) === '429'
-    const charsError = isError429 ? (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
-        : error ? <ErrorMessage /> : null
-    const classButton = `button ${loading ? 'button__secondary' : 'button__main'} button__long`
-    const styleButton = loading ? { width: 'unset' } : {}
+    const setContentCust = (processing) => {
+        switch (processing) {
+            case 'confirmed':
+                return null
+            case 'error429':
+                return (<span className="char__error_message">You have exceeded your rate limit.  Please try again later.</span>)
+            default:
+                return setContent(processing)
+        }
+    }
+
+    const classButton = `button ${processing === 'loading' ? 'button__secondary' : 'button__main'} button__long`
+    const styleButton = processing === 'loading' ? { width: 'unset' } : {}
 
     return (
         <div className="char__list">
             {viewList(chars)}
-            {charsError}
-            {loading ? <Spinner /> : null}
-            {(isError429 || loading || offset > charsMarvel - 1) ? null : (
+            {setContentCust(processing)}
+            {(processing === 'error429' || processing === 'loading' || offset > charsMarvel - 1) ? null : (
                 <button
                     className={classButton}
                     onClick={onRequest}

@@ -1,7 +1,6 @@
 import { useState, useEffect, memo } from 'react';
 
-import Spinner from "../spinner/Spinner"
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setContent from '../../utils/setContent';
 import { useMarvelBuffering } from "../../services/MarvelBuffering";
 
 import './randomChar.scss';
@@ -12,7 +11,7 @@ const RandomChar = memo(() => {
     const [char, setChar] = useState(null)
     const [selected, setSelected] = useState(true)
 
-    const { loading, error, getBuffer, charsMarvel, offsetCharsBeginMarvel } = useMarvelBuffering({
+    const { processing, loading, getBuffer, charsMarvel, offsetCharsBeginMarvel } = useMarvelBuffering({
         qtyMin: 3,
         qtyLimit: 10,
         callbackOffset: () => Math.floor(Math.random() * (charsMarvel - 10 - offsetCharsBeginMarvel) + offsetCharsBeginMarvel)
@@ -38,13 +37,12 @@ const RandomChar = memo(() => {
         setSelected(selected => !selected)
     }
 
-    const cardChar = loading ? <Spinner /> : (error || char === null) ? <ErrorMessage /> : <View char={char} selected={selected} />
     const btnText = selected ? 'Show others' : 'I choose'
-    const btnClass = `button ${(loading || error) ? 'button__secondary' : 'button__main'}`
+    const btnClass = `button ${(processing === 'waiting' || processing === 'error') ? 'button__secondary' : 'button__main'}`
 
     return (
         <div className="randomchar">
-            {cardChar}
+            {setContent(processing, View, { char, selected })}
 
             <div className="randomchar__static">
                 <p className="randomchar__title">
@@ -70,7 +68,8 @@ const sliceText = (text, maxLen) => {
     return str
 }
 
-const View = ({ char, selected }) => {
+const View = ({ data }) => {
+    const { char, selected } = data
     const { id, name, description, thumbnail, homepage, wiki } = char
     const btnClass = `button ${selected ? 'button__main' : 'button__secondary'}`
     const descriptionShort = sliceText(description, 210)

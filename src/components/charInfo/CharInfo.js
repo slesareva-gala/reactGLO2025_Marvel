@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from "react-router-dom"
 import PropTypes from 'prop-types';
-
-import Spinner from "../spinner/Spinner"
-import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
+import setContent from '../../utils/setContent';
 
 import { useMarvelService } from "../../services/MarvelService";
 
@@ -13,7 +11,7 @@ import './charInfo.scss';
 const CharInfo = ({ charId, setRefApp, onFocusTo, comicsMax = 10 }) => {
     const [char, setChar] = useState(0)
 
-    const { loading, error, getCharacter } = useMarvelService()
+    const { processing, setProcessing, getCharacter } = useMarvelService()
 
     useEffect(() => updateChar(), // eslint-disable-next-line react-hooks/exhaustive-deps
         [charId])
@@ -23,25 +21,33 @@ const CharInfo = ({ charId, setRefApp, onFocusTo, comicsMax = 10 }) => {
 
         getCharacter(charId)
             .then(onCharLoaded)
+            .then(() => setProcessing('confirmed'))
     }
 
     const onCharLoaded = (char) => {
         setChar(char)
     }
 
-    const content = error ? <ErrorMessage />
-        : loading ? <Spinner />
-            : char ? <View char={char} comicsMax={comicsMax} setRefApp={setRefApp} onFocusTo={onFocusTo} />
-                : <Skeleton />
+    const setContentCust = (processing) => {
+        if (processing === 'confirmed' && !char) processing = "error"
+
+        switch (processing) {
+            case 'waiting':
+                return <Skeleton />
+            default:
+                return setContent(processing, View, { char, comicsMax, setRefApp, onFocusTo })
+        }
+    }
 
     return (
         <div className="char__info">
-            {content}
+            {setContentCust(processing)}
         </div>
     )
 }
 
-const View = ({ char, comicsMax, setRefApp, onFocusTo }) => {
+const View = ({ data }) => {
+    const { char, comicsMax, setRefApp, onFocusTo } = data
     const { id, name, description, thumbnail, homepage, wiki, comics } = char
     const qtyComics = Math.min(comics.length, comicsMax)
     comics.length = qtyComics

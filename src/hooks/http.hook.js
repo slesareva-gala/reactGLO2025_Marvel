@@ -1,8 +1,7 @@
 import { useState, useCallback } from "react"
 
 export const useHttp = () => {
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
+    const [processing, setProcessing] = useState('waiting')
 
     const request = useCallback(
         async (url,
@@ -13,8 +12,8 @@ export const useHttp = () => {
                 'Accept-Language': 'en-US, en;q=0.9'
             }) => {
 
-            setLoading(true)
-            setError(null)
+            setProcessing('loading')
+
             try {
                 const response = await fetch(url, { method, body, headers })
 
@@ -24,19 +23,18 @@ export const useHttp = () => {
 
                 const data = await response.json()
 
-                setLoading(false)
+                //setProcessing('confirmed') -  устанавливаем "вручную" после обработки data в цепочке обработки then
 
                 return data
 
             } catch (e) {
-                const eMessage = e.message.includes('status:') ? e.message : `${e.message} ${url}, status: 000`
-                setLoading(false)
-                setError(eMessage)
-                throw new Error(eMessage);
+                const codeError = e.message.includes('status:') ? e.message.match(/(?<=status:\s*)\d{3}/g)[0] : '000'
+
+                setProcessing('error' + codeError)
+
+                throw new Error(e);
             }
         }, [])
 
-    const codeError = useCallback((eMessage) => eMessage.match(/(?<=status:\s*)\d{3}/g)[0], [])
-
-    return { loading, request, error, codeError }
+    return { request, processing, setProcessing }
 }

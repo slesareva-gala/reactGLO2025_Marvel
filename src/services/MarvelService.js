@@ -4,7 +4,7 @@ import imgNotFound from "../resources/img/image_not_found.webp"
 import imgNotAvailbale from "../resources/img/image_not_available.webp"
 
 export const useMarvelService = () => {
-    const { loading, request, error, codeError } = useHttp()
+    const { request, processing, setProcessing } = useHttp()
 
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/'
     const _apiKey = `apikey=${process.env.REACT_APP_MARVEL_API_KEY}`
@@ -98,8 +98,7 @@ export const useMarvelService = () => {
 
     return {
         charsMarvel, comicsMarvel, offsetCharsBeginMarvel,
-        loading,
-        error, codeError,
+        processing, setProcessing,
         getCharacter, getCharacterByName, getAllCharacters,
         getAllComics, getComic
     }
