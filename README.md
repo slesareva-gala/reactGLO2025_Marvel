@@ -1,5 +1,4 @@
-# Результат работы над проектом
-# "Marvel information portal"
+# Результат работы над проектом <br /> "Marvel information portal"
 __(__ Протестируйте __) =>__ __{__ [ДЕМО](https://slesareva-gala.github.io/reactGLO2025_Marvel) __};__
 
 
