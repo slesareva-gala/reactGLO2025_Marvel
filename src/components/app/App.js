@@ -14,7 +14,6 @@ const SingleCharacter = lazy(() => import('../pages/singleCharacter/SingleCharac
 
 const App = () => {
 
-
     return (
         <Router>
             <div className="app" >
@@ -22,16 +21,16 @@ const App = () => {
                 <main>
                     <Suspense fallback={<Spinner />}>
                         <Switch>
-                            <Route exact path="/">
+                            <Route exact path="/reactGLO2025_Marvel">
                                 <MainPage />
                             </Route>
-                            <Route exact path="/comics">
+                            <Route exact path="/reactGLO2025_Marvel/comics">
                                 <ComicsPage />
                             </Route>
-                            <Route exact path="/comics/:id">
+                            <Route exact path="/reactGLO2025_Marvel/comics/:id">
                                 <SinglePage Component={SingleComic} dataType='comic' />
                             </Route>
-                            <Route exact path="/characters/:id">
+                            <Route exact path="/reactGLO2025_Marvel/characters/:id">
                                 <SinglePage Component={SingleCharacter} dataType='character' />
                             </Route>
                             <Route path="*">

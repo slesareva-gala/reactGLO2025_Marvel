@@ -14,21 +14,19 @@ const CharSearchForm = () => {
 
     const onCharLoaded = (char) => {
         setChar(char);
+
+        setProcessing(char.length > 0 ? 'confirmed' : 'notfound')
     }
 
     const updateChar = (name) => {
         getCharacterByName(name)
             .then(onCharLoaded)
-            .then(() => setProcessing('confirmed'))
     }
 
     const setContentCust = (processing) => {
-        if (processing === 'confirmed' && !char.length) processing = "notfound"
 
         switch (processing) {
             case 'waiting':
-                return null
-            case 'clear':
                 return null
             case 'notfound':
                 return (
@@ -40,7 +38,7 @@ const CharSearchForm = () => {
                 return (
                     <div className="char__search-wrapper">
                         <div className="char__search-success">There is! Visit {char[0].name} page?</div>
-                        <Link to={`/characters/${char[0].id}`} className="button button__main">
+                        <Link to={`/reactGLO2025_Marvel/characters/${char[0].id}`} className="button button__main">
                             <div className="inner">To page</div>
                         </Link>
                     </div>
@@ -74,7 +72,7 @@ const CharSearchForm = () => {
                             name='charName'
                             type='text'
                             placeholder="Enter name"
-                            onInput={e => setProcessing('clear')}
+                            onInput={e => setProcessing('waiting')}
                         />
                         <button
                             type='submit'

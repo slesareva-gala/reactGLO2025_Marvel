@@ -22,13 +22,14 @@ const CharList = ({ charId, onCharSelected, setRefApp, onFocusTo }) => {
     const onRequest = () => {
         getAllCharacters(offset)
             .then(onCharListLoaded)
-            .then(() => setProcessing('confirmed'))
     }
 
     const onCharListLoaded = newChars => {
         setChars(chars => [...chars,
         ...newChars.filter(obj1 => chars.findIndex(obj2 => (obj2.id === obj1.id)) < 0)])
         setOffset(offset + 9)
+
+        setProcessing('confirmed')
     }
 
     const viewList = (chars) => {

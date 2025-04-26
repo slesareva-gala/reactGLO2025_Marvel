@@ -20,13 +20,14 @@ const ComicsList = () => {
 
         getAllComics(offset)
             .then(onComicsListLoaded)
-            .then(() => setProcessing('confirmed'))
     }
 
     const onComicsListLoaded = (newComics) => {
         setComics(comics => [...comics,
         ...newComics.filter(obj1 => comics.findIndex(obj2 => (obj2.id === obj1.id)) < 0)])
         setOffset(offset + 8)
+
+        setProcessing('confirmed')
     }
 
     const viewList = (comics) => {
@@ -35,7 +36,7 @@ const ComicsList = () => {
 
             return (
                 <li className="comics__item" key={id}>
-                    <Link to={`/comics/${id}`}>
+                    <Link to={`/reactGLO2025_Marvel/comics/${id}`}>
                         <img src={thumbnail} alt={title} className="comics__item-img" />
                         <div className="comics__item-name">{title}</div>
                         <div className="comics__item-price">{price}</div>

@@ -23,7 +23,7 @@ const RandomChar = memo(() => {
         [loading, selected])
 
     useEffect(() => {
-        const timerId = setInterval(() => onCharRender(), 3000)
+        const timerId = setInterval(() => onCharRender(), 5000)
         return () => clearInterval(timerId)
     })
 

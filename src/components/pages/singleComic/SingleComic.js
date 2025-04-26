@@ -24,7 +24,7 @@ const SingleComic = ({ data }) => {
                 <p className="single-comic__descr">Language: {language}</p>
                 <div className="single-comic__price">{price}</div>
             </div>
-            <Link to="/comics" className="single-comic__back">Back to all</Link>
+            <Link to="/reactGLO2025_Marvel/comics" className="single-comic__back">Back to all</Link>
         </div>
     )
 }

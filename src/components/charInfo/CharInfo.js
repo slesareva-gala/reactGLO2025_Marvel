@@ -21,15 +21,15 @@ const CharInfo = ({ charId, setRefApp, onFocusTo, comicsMax = 10 }) => {
 
         getCharacter(charId)
             .then(onCharLoaded)
-            .then(() => setProcessing('confirmed'))
     }
 
     const onCharLoaded = (char) => {
         setChar(char)
+
+        setProcessing(char ? 'confirmed' : 'error')
     }
 
     const setContentCust = (processing) => {
-        if (processing === 'confirmed' && !char) processing = "error"
 
         switch (processing) {
             case 'waiting':
@@ -89,7 +89,7 @@ const View = ({ data }) => {
                             <li className="char__comics-item" key={i}
                                 onKeyDown={e => (e.code === 'ArrowLeft') ? onFocusTo('CharList') : null}
                             >
-                                <Link to={`/comics/${id}`}>
+                                <Link to={`/reactGLO2025_Marvel/comics/${id}`}>
                                     {item.name}
                                 </Link>
                             </li>

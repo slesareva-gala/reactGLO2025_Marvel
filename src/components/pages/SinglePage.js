@@ -23,12 +23,10 @@ const SinglePage = ({ Component, dataType }) => {
             case 'comic':
                 getComic(id)
                     .then(onDataLoaded)
-                    .then(() => setProcessing('confirmed'))
                 break
             case 'character':
                 getCharacter(id)
                     .then(onDataLoaded)
-                    .then(() => setProcessing('confirmed'))
                 break
             default:
                 return
@@ -37,17 +35,14 @@ const SinglePage = ({ Component, dataType }) => {
 
     const onDataLoaded = (data) => {
         setData(data)
-    }
 
-    const setContentCust = (processing) => {
-        if (processing === 'confirmed' && !data) processing = "error"
-        return setContent(processing, Component, data)
+        setProcessing(data ? 'confirmed' : 'error')
     }
 
     return (
         <>
             <AppBanner />
-            {setContentCust(processing)}
+            {setContent(processing, Component, data)}
         </>
     )
 }
