@@ -1,3 +1,7 @@
+# Результат работы над проектом <br /> "Marvel information portal"
+__(__ Протестируйте __) =>__ __{__ [ДЕМО](https://slesareva-gala.github.io/reactGLO2025_Marvel) __};__
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
