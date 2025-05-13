@@ -24,6 +24,17 @@ export const useMarvelService = () => {
         }
     }
 
+    const getRandomCharacters = async (limit) => {
+        const randomOffset = Math.floor(Math.random() * (charsMarvel - 10 - offsetCharsBeginMarvel) + offsetCharsBeginMarvel)
+
+        try {
+            const res = await getAllCharacters(randomOffset, limit)
+            return res
+        } catch (e) {
+            return []
+        }
+    }
+
     const getCharacter = async (id) => {
         try {
             const res = await request(`${_apiBase}characters/${id}?${_apiKey} `)
@@ -99,7 +110,7 @@ export const useMarvelService = () => {
     return {
         charsMarvel, comicsMarvel, offsetCharsBeginMarvel,
         processing, setProcessing,
-        getCharacter, getCharacterByName, getAllCharacters,
+        getCharacter, getCharacterByName, getAllCharacters, getRandomCharacters,
         getAllComics, getComic
     }
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect, memo } from 'react';
 
 import setContent from '../../utils/setContent';
-import { useMarvelBuffering } from "../../services/MarvelBuffering";
+import { useBuffering } from "../../services/MarvelBuffering";
+import { useMarvelService } from '../../services/MarvelService';
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
@@ -11,16 +12,18 @@ const RandomChar = memo(() => {
     const [char, setChar] = useState(null)
     const [selected, setSelected] = useState(true)
 
-    const { processing, loading, getBuffer, charsMarvel, offsetCharsBeginMarvel } = useMarvelBuffering({
+    const { getRandomCharacters } = useMarvelService()
+
+    const { processing, getBuffer, updateBuffer } = useBuffering({
         qtyMin: 3,
         qtyLimit: 10,
-        callbackOffset: () => Math.floor(Math.random() * (charsMarvel - 10 - offsetCharsBeginMarvel) + offsetCharsBeginMarvel)
+        getData: (limit) => getRandomCharacters(limit)
     })
 
     useEffect(() => {
         onCharRender()
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
-        [loading, selected])
+        [selected])
 
     useEffect(() => {
         const timerId = setInterval(() => onCharRender(), 5000)
@@ -28,9 +31,11 @@ const RandomChar = memo(() => {
     })
 
     const onCharRender = () => {
-        if (selected && char) return
+
+        if (selected && char && processing !== 'error') return
 
         setChar(getBuffer())
+        updateBuffer()
     }
 
     const onCharSelected = () => {
