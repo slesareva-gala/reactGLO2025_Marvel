@@ -21,19 +21,23 @@ const RandomChar = memo(() => {
     })
 
     useEffect(() => {
-        onCharRender()
+        updateBuffer()
+    }, // eslint-disable-next-line react-hooks/exhaustive-deps
+        [])
+
+    useEffect(() => {
+        if (!selected) onCharRender()
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
         [selected])
 
     useEffect(() => {
-        const timerId = setInterval(() => onCharRender(), 5000)
+        const timerId = setInterval(() => {
+            if (!selected || processing === 'waiting') onCharRender()
+        }, 4000)
         return () => clearInterval(timerId)
     })
 
     const onCharRender = () => {
-
-        if (selected && char && processing !== 'error') return
-
         setChar(getBuffer())
         updateBuffer()
     }
@@ -43,7 +47,7 @@ const RandomChar = memo(() => {
     }
 
     const btnText = selected ? 'Show others' : 'I choose'
-    const btnClass = `button ${(processing === 'waiting' || processing === 'error') ? 'button__secondary' : 'button__main'}`
+    const btnClass = `button ${(processing === 'waiting') ? 'button__secondary' : 'button__main'}`
 
     return (
         <div className="randomchar">
